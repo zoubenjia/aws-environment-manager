@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 多账号配置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .environment-rule {
+            border: 3px solid;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .environment-rule.production {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+        }
+        
+        .environment-rule.development {
+            border-color: #28a745;
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+        }
+        
+        .environment-rule.staging {
+            border-color: #007bff;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+        }
+        
+        .environment-rule.custom {
+            border-color: #6c757d;
+            background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(108, 117, 125, 0.05));
+        }
+        
+        .environment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .environment-header.production { background: #dc3545; }
+        .environment-header.development { background: #28a745; }
+        .environment-header.staging { background: #007bff; }
+        .environment-header.custom { background: #6c757d; }
+        
+        .account-rule {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .account-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .rule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        
+        .btn:hover { opacity: 0.9; }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser - 多账号配置 (修复版)</h1>
+        <p>支持多个AWS账号，通过账号+区域组合精确识别环境</p>
+    </div>
+
+    <!-- 基础配置 -->
+    <div class="section">
+        <h2>🔧 基础设置</h2>
+        
+        <div class="form-group">
+            <label class="form-label">AWS SSO起始URL</label>
+            <input type="text" id="ssoStartUrl" class="form-input" 
+                   value="https://d-9067f2e3cc.awsapps.com/start/#/console">
+        </div>
+    </div>
+
+    <!-- 环境规则配置 -->
+    <div class="section">
+        <h2>🌍 环境规则配置</h2>
+        <p>为每个环境配置多个账号和区域组合</p>
+        
+        <div id="environmentRules">
+            <!-- 环境规则将通过JavaScript动态生成 -->
+        </div>
+        
+        <button type="button" class="btn btn-primary" id="addEnvironmentBtn">
+            ➕ 添加新环境
+        </button>
+        
+        <div id="debugInfo" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 12px;">
+            调试信息: 等待操作...
+        </div>
+    </div>
+
+    <!-- 保存配置 -->
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-success" id="saveConfigBtn">
+            💾 保存配置
+        </button>
+        <button class="btn btn-secondary" id="resetConfigBtn">
+            🔄 重置为默认
+        </button>
+    </div>
+
+    <div id="statusMessage" style="display: none;"></div>
+
+    <script>
+        // 调试函数
+        function debug(message) {
+            const debugDiv = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugDiv.textContent = `[${timestamp}] ${message}`;
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // 默认环境配置
+        let environmentRules = [
+            {
+                name: '生产环境',
+                type: 'production',
+                icon: '🔴',
+                color: '#dc3545',
+                accounts: [
+                    {
+                        accountId: '487783143761',
+                        accountName: '生产账号1',
+                        roleName: 'PowerUserAccess_prod',
+                        regions: ['eu-west-2', 'us-east-1']
+                    }
+                ]
+            },
+            {
+                name: '开发环境',
+                type: 'development',
+                icon: '🟢',
+                color: '#28a745',
+                accounts: [
+                    {
+                        accountId: '487783143761',
+                        accountName: '开发账号1',
+                        roleName: 'PowerUserAccess_dev',
+                        regions: ['eu-central-1', 'us-west-2']
+                    }
+                ]
+            },
+            {
+                name: '测试环境',
+                type: 'staging',
+                icon: '🔵',
+                color: '#007bff',
+                accounts: [
+                    {
+                        accountId: '487783143761',
+                        accountName: '测试账号1',
+                        roleName: 'PowerUserAccess_staging',
+                        regions: ['ap-southeast-1', 'ap-northeast-1']
+                    }
+                ]
+            }
+        ];
+
+        // 渲染环境规则
+        function renderEnvironmentRules() {
+            debug('开始渲染环境规则...');
+            
+            const container = document.getElementById('environmentRules');
+            if (!container) {
+                debug('错误: 找不到environmentRules容器');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            environmentRules.forEach((env, envIndex) => {
+                const envDiv = document.createElement('div');
+                envDiv.className = `environment-rule ${env.type}`;
+                
+                envDiv.innerHTML = `
+                    <div class="environment-header ${env.type}">
+                        <span>${env.icon} ${env.name}</span>
+                        <button type="button" class="btn btn-danger" onclick="removeEnvironment(${envIndex})">
+                            🗑️ 删除环境
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">环境名称</label>
+                        <input type="text" class="form-input" value="${env.name}" 
+                               onchange="updateEnvironment(${envIndex}, 'name', this.value)">
+                    </div>
+                    
+                    <div class="rule-grid">
+                        <div class="form-group">
+                            <label class="form-label">图标</label>
+                            <input type="text" class="form-input" value="${env.icon}" 
+                                   onchange="updateEnvironment(${envIndex}, 'icon', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">颜色</label>
+                            <input type="color" class="form-input" value="${env.color}" 
+                                   onchange="updateEnvironment(${envIndex}, 'color', this.value)">
+                        </div>
+                    </div>
+                    
+                    <h4>账号配置</h4>
+                    <div id="accounts-${envIndex}">
+                        ${env.accounts.map((account, accIndex) => `
+                            <div class="account-rule">
+                                <div class="account-header">
+                                    <span>📋 账号 ${accIndex + 1}</span>
+                                    <button type="button" class="btn btn-danger" onclick="removeAccount(${envIndex}, ${accIndex})">
+                                        🗑️ 删除账号
+                                    </button>
+                                </div>
+                                
+                                <div class="rule-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">账号名称</label>
+                                        <input type="text" class="form-input" value="${account.accountName}" 
+                                               onchange="updateAccount(${envIndex}, ${accIndex}, 'accountName', this.value)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">账号ID</label>
+                                        <input type="text" class="form-input" value="${account.accountId}" 
+                                               onchange="updateAccount(${envIndex}, ${accIndex}, 'accountId', this.value)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">角色名称</label>
+                                        <input type="text" class="form-input" value="${account.roleName}" 
+                                               onchange="updateAccount(${envIndex}, ${accIndex}, 'roleName', this.value)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">适用区域</label>
+                                        <input type="text" class="form-input" value="${account.regions.join(', ')}" 
+                                               placeholder="eu-west-2, us-east-1"
+                                               onchange="updateAccount(${envIndex}, ${accIndex}, 'regions', this.value.split(',').map(r => r.trim()))">
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button type="button" class="btn btn-primary" onclick="addAccount(${envIndex})">
+                        ➕ 添加账号
+                    </button>
+                `;
+                
+                container.appendChild(envDiv);
+            });
+            
+            debug(`渲染完成，共 ${environmentRules.length} 个环境`);
+        }
+
+        // 添加环境 - 修复版本
+        function addEnvironment() {
+            debug('添加新环境按钮被点击');
+            
+            try {
+                const newEnv = {
+                    name: '新环境',
+                    type: 'custom',
+                    icon: '⚪',
+                    color: '#6c757d',
+                    accounts: [{
+                        accountId: '123456789012',
+                        accountName: '新账号',
+                        roleName: 'PowerUserAccess',
+                        regions: ['us-east-1']
+                    }]
+                };
+                
+                environmentRules.push(newEnv);
+                debug(`新环境已添加，当前环境数量: ${environmentRules.length}`);
+                
+                renderEnvironmentRules();
+                debug('环境规则重新渲染完成');
+                
+                showStatus('✅ 新环境已添加', 'success');
+                
+            } catch (error) {
+                debug(`添加环境时出错: ${error.message}`);
+                showStatus('❌ 添加环境失败: ' + error.message, 'error');
+            }
+        }
+
+        // 删除环境
+        function removeEnvironment(envIndex) {
+            debug(`删除环境 ${envIndex}`);
+            
+            if (confirm('确定要删除这个环境吗？')) {
+                environmentRules.splice(envIndex, 1);
+                renderEnvironmentRules();
+                showStatus('✅ 环境已删除', 'success');
+            }
+        }
+
+        // 添加账号
+        function addAccount(envIndex) {
+            debug(`为环境 ${envIndex} 添加账号`);
+            
+            const newAccount = {
+                accountId: '123456789012',
+                accountName: '新账号',
+                roleName: 'PowerUserAccess',
+                regions: ['us-east-1']
+            };
+            
+            environmentRules[envIndex].accounts.push(newAccount);
+            renderEnvironmentRules();
+            showStatus('✅ 账号已添加', 'success');
+        }
+
+        // 删除账号
+        function removeAccount(envIndex, accIndex) {
+            debug(`删除环境 ${envIndex} 的账号 ${accIndex}`);
+            
+            if (confirm('确定要删除这个账号吗？')) {
+                environmentRules[envIndex].accounts.splice(accIndex, 1);
+                renderEnvironmentRules();
+                showStatus('✅ 账号已删除', 'success');
+            }
+        }
+
+        // 更新环境
+        function updateEnvironment(envIndex, field, value) {
+            debug(`更新环境 ${envIndex} 的 ${field} 为 ${value}`);
+            environmentRules[envIndex][field] = value;
+        }
+
+        // 更新账号
+        function updateAccount(envIndex, accIndex, field, value) {
+            debug(`更新环境 ${envIndex} 账号 ${accIndex} 的 ${field}`);
+            environmentRules[envIndex].accounts[accIndex][field] = value;
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status status-${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 保存配置
+        function saveConfiguration() {
+            debug('保存配置');
+            
+            const config = {
+                ssoStartUrl: document.getElementById('ssoStartUrl').value,
+                environmentRules: environmentRules
+            };
+            
+            try {
+                if (typeof browser !== 'undefined' && browser.storage) {
+                    browser.storage.local.set(config);
+                    showStatus('配置已保存！请重新载入扩展。', 'success');
+                } else {
+                    localStorage.setItem('awsMultiAccountConfig', JSON.stringify(config));
+                    showStatus('配置已保存到本地存储！', 'success');
+                }
+            } catch (error) {
+                showStatus('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 重置配置
+        function resetConfiguration() {
+            if (confirm('确定要重置为默认配置吗？')) {
+                location.reload();
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            debug('页面加载完成，开始初始化');
+            
+            // 绑定事件监听器
+            const addBtn = document.getElementById('addEnvironmentBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', addEnvironment);
+                debug('添加环境按钮事件已绑定');
+            } else {
+                debug('错误: 找不到添加环境按钮');
+            }
+            
+            const saveBtn = document.getElementById('saveConfigBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveConfiguration);
+                debug('保存配置按钮事件已绑定');
+            }
+            
+            const resetBtn = document.getElementById('resetConfigBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetConfiguration);
+                debug('重置配置按钮事件已绑定');
+            }
+            
+            // 渲染环境规则
+            renderEnvironmentRules();
+            
+            debug('初始化完成');
+        });
+    </script>
+</body>
+</html>
