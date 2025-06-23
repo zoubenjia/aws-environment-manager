@@ -1,0 +1,57 @@
+{
+  "manifest_version": 2,
+  "name": "AWS Environment Browser",
+  "version": "1.0.0",
+  "description": "AWS多环境浏览器配置扩展 - 自动环境识别、容器管理、区域颜色标识",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "*://*.console.aws.amazon.com/*",
+    "*://*.awsapps.com/*"
+  ],
+  
+  "background": {
+    "scripts": ["background-tst.js"],
+    "persistent": false
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["*://*.console.aws.amazon.com/*"],
+      "js": ["tst-auto-modifier.js"],
+      "css": ["userContent.css"],
+      "run_at": "document_start"
+    }
+  ],
+  
+  "browser_action": {
+    "default_popup": "simple-test.html",
+    "default_title": "Simple Test",
+    "default_icon": {
+      "16": "icons/icon-16.svg",
+      "32": "icons/icon-32.svg",
+      "48": "icons/icon-48.svg",
+      "128": "icons/icon-128.svg"
+    }
+  },
+  
+  "options_ui": {
+    "page": "csp-compliant-config.html",
+    "open_in_tab": true
+  },
+  
+  "icons": {
+    "16": "icons/icon-16.svg",
+    "32": "icons/icon-32.svg",
+    "48": "icons/icon-48.svg",
+    "128": "icons/icon-128.svg"
+  },
+  
+  "web_accessible_resources": [
+    "aws-quick-access.html",
+    "tst-tab-colors.css",
+    "auto-tst-setup.js"
+  ]
+}
