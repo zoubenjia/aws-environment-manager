@@ -1,0 +1,55 @@
+    <!-- 容器选择对话框 -->
+    <div id="containerDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box" style="width: 400px;">
+            <div class="dialog-header">
+                <span>📦 选择容器类型</span>
+                <button id="containerDialogClose" class="dialog-close">×</button>
+            </div>
+            <div class="dialog-content" style="padding: 20px;">
+                <div style="margin-bottom: 16px; font-size: 14px; color: #666;">
+                    选择适合您环境的容器类型，每种容器都有不同的隔离级别和安全特性：
+                </div>
+                
+                <div class="container-options">
+                    <div class="container-option" data-container-id="production">
+                        <div class="container-icon">🔴</div>
+                        <div class="container-info">
+                            <div class="container-name">生产容器</div>
+                            <div class="container-desc">高安全级别 • 审计日志 • 只读模式</div>
+                        </div>
+                        <div class="container-badge production">PROD</div>
+                    </div>
+                    
+                    <div class="container-option" data-container-id="development">
+                        <div class="container-icon">🟢</div>
+                        <div class="container-info">
+                            <div class="container-name">开发容器</div>
+                            <div class="container-desc">完全访问 • 调试模式 • 自动保存</div>
+                        </div>
+                        <div class="container-badge development">DEV</div>
+                    </div>
+                    
+                    <div class="container-option" data-container-id="staging">
+                        <div class="container-icon">🔵</div>
+                        <div class="container-info">
+                            <div class="container-name">测试容器</div>
+                            <div class="container-desc">预发布验证 • 性能监控 • 回滚支持</div>
+                        </div>
+                        <div class="container-badge staging">TEST</div>
+                    </div>
+                    
+                    <div class="container-option" data-container-id="sandbox">
+                        <div class="container-icon">🟡</div>
+                        <div class="container-info">
+                            <div class="container-name">沙盒容器</div>
+                            <div class="container-desc">最大隔离 • 临时存储 • 自动清理</div>
+                        </div>
+                        <div class="container-badge sandbox">SAND</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button id="containerDialogCancel" class="dialog-btn dialog-btn-cancel">取消</button>
+            </div>
+        </div>
+    </div>
