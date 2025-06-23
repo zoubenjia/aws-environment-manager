@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 专业图标生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .icon-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .icon-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .icon-preview {
+            margin: 15px 0;
+        }
+        
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            margin: 5px;
+            background: white;
+        }
+        
+        .icon-size {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .download-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: rgba(0, 123, 255, 0.8);
+            border-color: rgba(0, 123, 255, 0.9);
+        }
+        
+        .customization {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            box-sizing: border-box;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .color-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .preview-all {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 AWS Environment Browser 专业图标生成器</h1>
+        
+        <div class="customization">
+            <h3>🎯 图标自定义设置</h3>
+            <div class="color-inputs">
+                <div class="form-group">
+                    <label class="form-label">主色调</label>
+                    <input type="color" id="primaryColor" class="form-input" value="#667eea">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">次色调</label>
+                    <input type="color" id="secondaryColor" class="form-input" value="#764ba2">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">图标样式</label>
+                    <select id="iconStyle" class="form-input">
+                        <option value="cloud">☁️ 云朵 + 闪电</option>
+                        <option value="aws">AWS 字母</option>
+                        <option value="environment">🌍 环境切换</option>
+                        <option value="container">📦 容器管理</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="generateIcons()">🔄 重新生成图标</button>
+        </div>
+        
+        <div class="preview-all">
+            <h3>📱 所有尺寸预览</h3>
+        </div>
+        <div class="preview-all" id="previewAll">
+            <!-- 预览将在这里生成 -->
+        </div>
+        
+        <div class="icon-grid" id="iconGrid">
+            <!-- 图标卡片将在这里生成 -->
+        </div>
+        
+        <div class="download-section">
+            <button class="btn btn-primary" onclick="downloadAllIcons()">📥 下载所有图标 (PNG)</button>
+            <button class="btn" onclick="downloadSVGIcons()">📥 下载 SVG 图标</button>
+            <button class="btn" onclick="generateManifestCode()">📋 生成 Manifest 代码</button>
+        </div>
+        
+        <div id="manifestCode" style="display: none; margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+            <h4>📄 Manifest.json 图标配置代码：</h4>
+            <pre id="manifestCodeContent" style="color: #00ff00; font-family: monospace; white-space: pre-wrap;"></pre>
+        </div>
+    </div>
+
+    <script>
+        const sizes = [16, 32, 48, 128];
+        let canvases = {};
+        
+        function createIcon(canvas, size, primaryColor, secondaryColor, style) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+            
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, primaryColor);
+            gradient.addColorStop(1, secondaryColor);
+            
+            // 绘制圆角背景
+            const radius = size * 0.15;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+            
+            // 根据样式绘制图标
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            switch(style) {
+                case 'cloud':
+                    drawCloudIcon(ctx, size);
+                    break;
+                case 'aws':
+                    drawAWSIcon(ctx, size);
+                    break;
+                case 'environment':
+                    drawEnvironmentIcon(ctx, size);
+                    break;
+                case 'container':
+                    drawContainerIcon(ctx, size);
+                    break;
+            }
+            
+            // 添加光泽效果
+            const glossGradient = ctx.createLinearGradient(0, 0, 0, size * 0.5);
+            glossGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+            glossGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glossGradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size * 0.5, radius);
+            ctx.fill();
+            
+            // 边框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(0.5, 0.5, size - 1, size - 1, radius);
+            ctx.stroke();
+        }
+        
+        function drawCloudIcon(ctx, size) {
+            // 云朵
+            ctx.font = `${size * 0.4}px Arial`;
+            ctx.fillText('☁️', size/2, size/2 - size*0.1);
+            
+            if (size >= 32) {
+                // 闪电
+                ctx.font = `${size * 0.25}px Arial`;
+                ctx.fillText('⚡', size/2, size/2 + size*0.2);
+            }
+        }
+        
+        function drawAWSIcon(ctx, size) {
+            ctx.font = `bold ${size * 0.3}px Arial`;
+            ctx.fillText('AWS', size/2, size/2);
+            
+            if (size >= 48) {
+                ctx.font = `${size * 0.15}px Arial`;
+                ctx.fillText('ENV', size/2, size/2 + size*0.25);
+            }
+        }
+        
+        function drawEnvironmentIcon(ctx, size) {
+            ctx.font = `${size * 0.35}px Arial`;
+            ctx.fillText('🌍', size/2, size/2 - size*0.05);
+            
+            if (size >= 32) {
+                // 切换箭头
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = size * 0.04;
+                ctx.beginPath();
+                ctx.arc(size/2, size/2 + size*0.15, size*0.12, 0, Math.PI);
+                ctx.stroke();
+                
+                // 箭头
+                const arrowSize = size * 0.06;
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.moveTo(size/2 - size*0.12, size/2 + size*0.15);
+                ctx.lineTo(size/2 - size*0.12 - arrowSize, size/2 + size*0.15 - arrowSize);
+                ctx.lineTo(size/2 - size*0.12 - arrowSize, size/2 + size*0.15 + arrowSize);
+                ctx.fill();
+            }
+        }
+        
+        function drawContainerIcon(ctx, size) {
+            ctx.font = `${size * 0.4}px Arial`;
+            ctx.fillText('📦', size/2, size/2);
+            
+            if (size >= 48) {
+                // 多个容器效果
+                ctx.globalAlpha = 0.6;
+                ctx.fillText('📦', size/2 - size*0.15, size/2 - size*0.1);
+                ctx.fillText('📦', size/2 + size*0.15, size/2 + size*0.1);
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        function generateIcons() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const style = document.getElementById('iconStyle').value;
+            
+            // 清空现有内容
+            document.getElementById('iconGrid').innerHTML = '';
+            document.getElementById('previewAll').innerHTML = '';
+            
+            // 生成预览
+            const previewContainer = document.getElementById('previewAll');
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvas.style.margin = '5px';
+                canvases[size] = canvas;
+                
+                createIcon(canvas, size, primaryColor, secondaryColor, style);
+                previewContainer.appendChild(canvas);
+                
+                // 添加尺寸标签
+                const label = document.createElement('div');
+                label.textContent = `${size}×${size}`;
+                label.style.fontSize = '12px';
+                label.style.textAlign = 'center';
+                label.style.marginTop = '5px';
+                previewContainer.appendChild(label);
+            });
+            
+            // 生成详细卡片
+            const gridContainer = document.getElementById('iconGrid');
+            sizes.forEach(size => {
+                const card = document.createElement('div');
+                card.className = 'icon-card';
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                
+                createIcon(canvas, size, primaryColor, secondaryColor, style);
+                
+                card.innerHTML = `
+                    <div class="icon-size">${size} × ${size} 像素</div>
+                    <div class="icon-preview"></div>
+                    <button class="btn" onclick="downloadIcon(${size})">下载 PNG</button>
+                `;
+                
+                card.querySelector('.icon-preview').appendChild(canvas);
+                gridContainer.appendChild(card);
+            });
+        }
+        
+        function downloadIcon(size) {
+            const canvas = canvases[size];
+            const link = document.createElement('a');
+            link.download = `aws-env-icon-${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function downloadAllIcons() {
+            sizes.forEach(size => {
+                setTimeout(() => downloadIcon(size), size * 10);
+            });
+        }
+        
+        function downloadSVGIcons() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            
+            sizes.forEach(size => {
+                const svg = createSVGIcon(size, primaryColor, secondaryColor);
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `aws-env-icon-${size}.svg`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+        
+        function createSVGIcon(size, primaryColor, secondaryColor) {
+            return `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad${size}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:${primaryColor};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${secondaryColor};stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="${size}" height="${size}" fill="url(#grad${size})" rx="${size * 0.15}"/>
+                <text x="${size/2}" y="${size/2}" font-family="Arial" font-size="${size * 0.4}" fill="white" text-anchor="middle" dominant-baseline="middle">☁️</text>
+                ${size >= 32 ? `<text x="${size/2}" y="${size/2 + size*0.2}" font-family="Arial" font-size="${size * 0.25}" fill="white" text-anchor="middle" dominant-baseline="middle">⚡</text>` : ''}
+            </svg>`;
+        }
+        
+        function generateManifestCode() {
+            const code = `"icons": {
+    "16": "icons/aws-env-icon-16.png",
+    "32": "icons/aws-env-icon-32.png", 
+    "48": "icons/aws-env-icon-48.png",
+    "128": "icons/aws-env-icon-128.png"
+},
+
+"browser_action": {
+    "default_icon": {
+        "16": "icons/aws-env-icon-16.png",
+        "32": "icons/aws-env-icon-32.png",
+        "48": "icons/aws-env-icon-48.png",
+        "128": "icons/aws-env-icon-128.png"
+    }
+}`;
+            
+            document.getElementById('manifestCodeContent').textContent = code;
+            document.getElementById('manifestCode').style.display = 'block';
+        }
+        
+        // 页面加载时生成默认图标
+        window.addEventListener('load', generateIcons);
+        
+        // 添加 roundRect polyfill for older browsers
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+    </script>
+</body>
+</html>
