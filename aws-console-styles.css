@@ -1,0 +1,250 @@
+/**
+ * AWS Environment Browser Extension - Console Styles
+ * AWS控制台页面样式：区域颜色标识和环境指示器
+ */
+
+/* AWS控制台导航栏基础样式 */
+#awsc-nav-header,
+.awsc-nav-header,
+header[role="banner"],
+.globalNav-0131,
+nav[class*="globalNav"],
+[data-testid="awsc-nav-header"] {
+    transition: background-color 0.3s ease !important;
+}
+
+/* 区域颜色样式 */
+
+/* 伦敦区域 - eu-west-2 */
+body[data-aws-region="eu-west-2"] #awsc-nav-header,
+body[data-aws-region="eu-west-2"] .awsc-nav-header,
+body[data-aws-region="eu-west-2"] header[role="banner"],
+body[data-aws-region="eu-west-2"] .globalNav-0131,
+body[data-aws-region="eu-west-2"] nav[class*="globalNav"],
+body[data-aws-region="eu-west-2"] [data-testid="awsc-nav-header"] {
+    background-color: #ffcccc !important;
+    border-bottom: 3px solid #ff9999 !important;
+}
+
+/* 法兰克福区域 - eu-central-1 */
+body[data-aws-region="eu-central-1"] #awsc-nav-header,
+body[data-aws-region="eu-central-1"] .awsc-nav-header,
+body[data-aws-region="eu-central-1"] header[role="banner"],
+body[data-aws-region="eu-central-1"] .globalNav-0131,
+body[data-aws-region="eu-central-1"] nav[class*="globalNav"],
+body[data-aws-region="eu-central-1"] [data-testid="awsc-nav-header"] {
+    background-color: #ccffcc !important;
+    border-bottom: 3px solid #99ff99 !important;
+}
+
+/* 北弗吉尼亚区域 - us-east-1 */
+body[data-aws-region="us-east-1"] #awsc-nav-header,
+body[data-aws-region="us-east-1"] .awsc-nav-header,
+body[data-aws-region="us-east-1"] header[role="banner"],
+body[data-aws-region="us-east-1"] .globalNav-0131,
+body[data-aws-region="us-east-1"] nav[class*="globalNav"],
+body[data-aws-region="us-east-1"] [data-testid="awsc-nav-header"] {
+    background-color: #cce5ff !important;
+    border-bottom: 3px solid #99ccff !important;
+}
+
+/* 俄勒冈区域 - us-west-2 */
+body[data-aws-region="us-west-2"] #awsc-nav-header,
+body[data-aws-region="us-west-2"] .awsc-nav-header,
+body[data-aws-region="us-west-2"] header[role="banner"],
+body[data-aws-region="us-west-2"] .globalNav-0131,
+body[data-aws-region="us-west-2"] nav[class*="globalNav"],
+body[data-aws-region="us-west-2"] [data-testid="awsc-nav-header"] {
+    background-color: #ffffcc !important;
+    border-bottom: 3px solid #ffff99 !important;
+}
+
+/* 新加坡区域 - ap-southeast-1 */
+body[data-aws-region="ap-southeast-1"] #awsc-nav-header,
+body[data-aws-region="ap-southeast-1"] .awsc-nav-header,
+body[data-aws-region="ap-southeast-1"] header[role="banner"],
+body[data-aws-region="ap-southeast-1"] .globalNav-0131,
+body[data-aws-region="ap-southeast-1"] nav[class*="globalNav"],
+body[data-aws-region="ap-southeast-1"] [data-testid="awsc-nav-header"] {
+    background-color: #ffccff !important;
+    border-bottom: 3px solid #ff99ff !important;
+}
+
+/* 东京区域 - ap-northeast-1 */
+body[data-aws-region="ap-northeast-1"] #awsc-nav-header,
+body[data-aws-region="ap-northeast-1"] .awsc-nav-header,
+body[data-aws-region="ap-northeast-1"] header[role="banner"],
+body[data-aws-region="ap-northeast-1"] .globalNav-0131,
+body[data-aws-region="ap-northeast-1"] nav[class*="globalNav"],
+body[data-aws-region="ap-northeast-1"] [data-testid="awsc-nav-header"] {
+    background-color: #ccffff !important;
+    border-bottom: 3px solid #99ffff !important;
+}
+
+/* 环境指示器样式 */
+.aws-environment-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.aws-environment-indicator:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 区域指示器 */
+.aws-region-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #007ec6;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #007ec6;
+    box-shadow: 0 2px 8px rgba(0, 123, 198, 0.2);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.aws-region-indicator:hover {
+    background: #007ec6;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 198, 0.3);
+}
+
+/* 环境警告（生产环境） */
+.aws-environment-warning {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+    z-index: 10001;
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.4);
+    animation: warningPulse 2s infinite;
+    cursor: pointer;
+}
+
+.aws-environment-warning:hover {
+    animation-play-state: paused;
+    transform: scale(1.05);
+}
+
+@keyframes warningPulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.8; 
+        transform: scale(1.02);
+    }
+}
+
+/* 环境标识样式 */
+body[data-aws-environment="production"] .aws-environment-indicator {
+    border-color: #ff4444;
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+}
+
+body[data-aws-environment="development"] .aws-environment-indicator {
+    border-color: #4ecdc4;
+    color: #4ecdc4;
+    background: rgba(78, 205, 196, 0.1);
+}
+
+body[data-aws-environment="staging"] .aws-environment-indicator {
+    border-color: #45b7d1;
+    color: #45b7d1;
+    background: rgba(69, 183, 209, 0.1);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .aws-region-indicator,
+    .aws-environment-indicator {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: inline-block;
+        margin: 5px;
+    }
+    
+    .aws-environment-warning {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: inline-block;
+        margin: 5px;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .aws-region-indicator,
+    .aws-environment-indicator {
+        border-width: 3px;
+        font-weight: 700;
+    }
+    
+    .aws-environment-warning {
+        border: 2px solid white;
+    }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+    .aws-region-indicator,
+    .aws-environment-indicator,
+    .aws-environment-warning {
+        transition: none;
+        animation: none;
+    }
+    
+    .aws-environment-warning {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .aws-region-indicator,
+    .aws-environment-indicator {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+    }
+    
+    .aws-environment-warning {
+        box-shadow: 0 2px 8px rgba(255, 68, 68, 0.6);
+    }
+}
