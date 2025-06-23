@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ultimate Test</title>
+</head>
+<body style="width: 300px; height: 400px; padding: 20px; background: #f0f0f0; font-family: Arial, sans-serif;">
+    <h3>🔍 终极测试</h3>
+    
+    <p><strong>如果您能看到这段文字，说明HTML加载正常。</strong></p>
+    
+    <div id="jsTest" style="background: #ffcccc; padding: 10px; margin: 10px 0; border-radius: 4px;">
+        JavaScript状态：未执行
+    </div>
+    
+    <!-- 测试1: 最简单的内联事件 -->
+    <button onclick="alert('测试1成功！');" style="width: 100%; padding: 10px; margin: 5px 0; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        测试1: 内联onclick
+    </button>
+    
+    <!-- 测试2: 内联事件 + 控制台 -->
+    <button onclick="console.log('测试2被点击'); alert('测试2成功！控制台有日志');" style="width: 100%; padding: 10px; margin: 5px 0; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        测试2: 内联 + 控制台
+    </button>
+    
+    <!-- 测试3: 内联事件 + DOM操作 -->
+    <button onclick="document.getElementById('result').innerHTML = '测试3成功！时间：' + new Date().toLocaleString(); alert('测试3成功！');" style="width: 100%; padding: 10px; margin: 5px 0; background: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer;">
+        测试3: 内联 + DOM
+    </button>
+    
+    <!-- 测试4: addEventListener绑定 -->
+    <button id="test4Btn" style="width: 100%; padding: 10px; margin: 5px 0; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        测试4: addEventListener
+    </button>
+    
+    <!-- 测试5: Firefox API测试 -->
+    <button id="test5Btn" style="width: 100%; padding: 10px; margin: 5px 0; background: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        测试5: Firefox API
+    </button>
+    
+    <div id="result" style="background: #e9ecef; padding: 10px; margin: 10px 0; border-radius: 4px; min-height: 20px;">
+        结果显示区域
+    </div>
+    
+    <div id="apiResult" style="background: #d1ecf1; padding: 10px; margin: 10px 0; border-radius: 4px; min-height: 20px;">
+        API测试结果
+    </div>
+    
+    <script>
+        console.log('🔍 终极测试脚本开始执行');
+        
+        // 立即更新JavaScript状态
+        const jsTestDiv = document.getElementById('jsTest');
+        if (jsTestDiv) {
+            jsTestDiv.innerHTML = 'JavaScript状态：✅ 正常执行 - ' + new Date().toLocaleString();
+            jsTestDiv.style.background = '#ccffcc';
+        }
+        
+        // 测试4: addEventListener
+        const test4Btn = document.getElementById('test4Btn');
+        if (test4Btn) {
+            test4Btn.addEventListener('click', function() {
+                console.log('测试4: addEventListener被点击');
+                document.getElementById('result').innerHTML = '测试4成功！addEventListener正常工作 - ' + new Date().toLocaleString();
+                alert('测试4成功！addEventListener正常工作');
+            });
+            console.log('✅ 测试4按钮事件已绑定');
+        } else {
+            console.error('❌ 找不到测试4按钮');
+        }
+        
+        // 测试5: Firefox API
+        const test5Btn = document.getElementById('test5Btn');
+        if (test5Btn) {
+            test5Btn.addEventListener('click', function() {
+                console.log('测试5: Firefox API测试');
+                
+                let apiInfo = 'Firefox API测试结果：<br>';
+                apiInfo += 'browser存在: ' + (typeof browser !== 'undefined') + '<br>';
+                apiInfo += 'chrome存在: ' + (typeof chrome !== 'undefined') + '<br>';
+                
+                if (typeof browser !== 'undefined') {
+                    apiInfo += 'browser.storage存在: ' + (typeof browser.storage !== 'undefined') + '<br>';
+                    apiInfo += 'browser.storage.local存在: ' + (typeof browser.storage?.local !== 'undefined') + '<br>';
+                    apiInfo += 'browser.tabs存在: ' + (typeof browser.tabs !== 'undefined') + '<br>';
+                } else {
+                    apiInfo += 'browser对象不存在！<br>';
+                }
+                
+                document.getElementById('apiResult').innerHTML = apiInfo;
+                
+                // 尝试简单的存储测试
+                if (typeof browser !== 'undefined' && browser.storage?.local) {
+                    browser.storage.local.set({test_key: 'test_value', test_time: Date.now()})
+                        .then(() => {
+                            console.log('✅ 存储测试成功');
+                            document.getElementById('apiResult').innerHTML += '存储测试: ✅ 成功<br>';
+                            alert('测试5成功！Firefox API正常工作');
+                        })
+                        .catch(error => {
+                            console.error('❌ 存储测试失败:', error);
+                            document.getElementById('apiResult').innerHTML += '存储测试: ❌ 失败 - ' + error.message + '<br>';
+                            alert('测试5部分成功！API存在但存储失败: ' + error.message);
+                        });
+                } else {
+                    alert('测试5失败！Firefox API不可用');
+                }
+            });
+            console.log('✅ 测试5按钮事件已绑定');
+        } else {
+            console.error('❌ 找不到测试5按钮');
+        }
+        
+        console.log('🔍 终极测试脚本执行完成');
+        
+        // 额外的诊断信息
+        console.log('页面信息:');
+        console.log('- URL:', window.location.href);
+        console.log('- 用户代理:', navigator.userAgent);
+        console.log('- 文档状态:', document.readyState);
+        console.log('- 扩展环境:', typeof browser !== 'undefined' ? 'WebExtensions' : typeof chrome !== 'undefined' ? 'Chrome Extensions' : '普通网页');
+    </script>
+</body>
+</html>
