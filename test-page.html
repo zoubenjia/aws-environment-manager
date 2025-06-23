@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Console Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+        }
+        
+        /* 模拟AWS控制台导航栏 */
+        #awsc-nav-header {
+            background: #232f3e;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background-color 0.3s ease;
+        }
+        
+        .nav-logo {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .nav-region {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .test-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .test-btn:hover {
+            background: #f8f9fa;
+            border-color: #007ec6;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- 模拟AWS控制台导航栏 -->
+    <div id="awsc-nav-header">
+        <div class="nav-logo">AWS Management Console</div>
+        <div class="nav-region" id="currentRegion">Loading...</div>
+    </div>
+
+    <div class="content">
+        <div class="test-section">
+            <h2>🧪 AWS Environment Browser Extension 测试页面</h2>
+            <p>这是一个模拟AWS控制台的测试页面，用于测试扩展功能。</p>
+            <div class="status info" id="extensionStatus">
+                正在检测扩展状态...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎨 区域颜色测试</h3>
+            <p>点击下面的按钮模拟不同AWS区域，测试导航栏颜色变化：</p>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="simulateRegion('eu-west-2')">🇬🇧 伦敦 (eu-west-2)</button>
+                <button class="test-btn" onclick="simulateRegion('eu-central-1')">🇩🇪 法兰克福 (eu-central-1)</button>
+                <button class="test-btn" onclick="simulateRegion('us-east-1')">🇺🇸 北弗吉尼亚 (us-east-1)</button>
+                <button class="test-btn" onclick="simulateRegion('us-west-2')">🇺🇸 俄勒冈 (us-west-2)</button>
+                <button class="test-btn" onclick="simulateRegion('ap-southeast-1')">🇸🇬 新加坡 (ap-southeast-1)</button>
+                <button class="test-btn" onclick="simulateRegion('ap-northeast-1')">🇯🇵 东京 (ap-northeast-1)</button>
+            </div>
+            <div class="status" id="regionStatus" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>⌨️ 快捷键测试</h3>
+            <p>测试以下快捷键功能：</p>
+            <ul>
+                <li><code>Ctrl+Shift+R</code> - 显示区域信息</li>
+                <li><code>Ctrl+Shift+E</code> - 打开环境切换器</li>
+            </ul>
+            <div class="status" id="shortcutStatus" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 扩展检测</h3>
+            <p>检测扩展是否正确加载和工作：</p>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="checkExtension()">检测扩展状态</button>
+                <button class="test-btn" onclick="checkRegionIndicator()">检查区域指示器</button>
+                <button class="test-btn" onclick="checkEnvironmentWarning()">检查环境警告</button>
+            </div>
+            <div class="status" id="checkStatus" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 测试检查清单</h3>
+            <div id="checklist">
+                <label><input type="checkbox" id="check1"> 扩展图标出现在工具栏</label><br>
+                <label><input type="checkbox" id="check2"> 弹出窗口正常显示</label><br>
+                <label><input type="checkbox" id="check3"> 环境切换按钮可点击</label><br>
+                <label><input type="checkbox" id="check4"> 区域颜色正确显示</label><br>
+                <label><input type="checkbox" id="check5"> 区域指示器显示</label><br>
+                <label><input type="checkbox" id="check6"> 生产环境警告工作</label><br>
+                <label><input type="checkbox" id="check7"> 快捷键响应正常</label><br>
+                <label><input type="checkbox" id="check8"> 设置页面可访问</label><br>
+            </div>
+            <div class="test-buttons">
+                <button class="test-btn" onclick="checkAll()">全部选中</button>
+                <button class="test-btn" onclick="uncheckAll()">全部取消</button>
+                <button class="test-btn" onclick="showResults()">显示测试结果</button>
+            </div>
+            <div class="status" id="testResults" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟区域切换
+        function simulateRegion(region) {
+            document.body.setAttribute('data-aws-region', region);
+            document.getElementById('currentRegion').textContent = region;
+            
+            const regionNames = {
+                'eu-west-2': '🇬🇧 伦敦',
+                'eu-central-1': '🇩🇪 法兰克福',
+                'us-east-1': '🇺🇸 北弗吉尼亚',
+                'us-west-2': '🇺🇸 俄勒冈',
+                'ap-southeast-1': '🇸🇬 新加坡',
+                'ap-northeast-1': '🇯🇵 东京'
+            };
+            
+            const status = document.getElementById('regionStatus');
+            status.className = 'status success';
+            status.style.display = 'block';
+            status.textContent = `✅ 已切换到 ${regionNames[region]} (${region})`;
+            
+            // 检查导航栏颜色是否变化
+            setTimeout(() => {
+                const nav = document.getElementById('awsc-nav-header');
+                const computedStyle = window.getComputedStyle(nav);
+                const bgColor = computedStyle.backgroundColor;
+                
+                if (bgColor !== 'rgb(35, 47, 62)') { // 不是默认颜色
+                    status.textContent += ` - 导航栏颜色已变化: ${bgColor}`;
+                } else {
+                    status.className = 'status error';
+                    status.textContent = `❌ 导航栏颜色未变化，请检查扩展CSS是否加载`;
+                }
+            }, 100);
+        }
+        
+        // 检测扩展状态
+        function checkExtension() {
+            const status = document.getElementById('checkStatus');
+            status.style.display = 'block';
+            
+            // 检查是否有区域指示器
+            const indicator = document.querySelector('.aws-region-indicator');
+            if (indicator) {
+                status.className = 'status success';
+                status.textContent = '✅ 扩展正常工作 - 检测到区域指示器';
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ 扩展可能未正常工作 - 未检测到区域指示器';
+            }
+        }
+        
+        // 检查区域指示器
+        function checkRegionIndicator() {
+            const status = document.getElementById('checkStatus');
+            status.style.display = 'block';
+            
+            const indicators = document.querySelectorAll('.aws-region-indicator, .aws-environment-indicator');
+            if (indicators.length > 0) {
+                status.className = 'status success';
+                status.textContent = `✅ 找到 ${indicators.length} 个指示器`;
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ 未找到区域或环境指示器';
+            }
+        }
+        
+        // 检查环境警告
+        function checkEnvironmentWarning() {
+            const status = document.getElementById('checkStatus');
+            status.style.display = 'block';
+            
+            const warning = document.querySelector('.aws-environment-warning');
+            if (warning) {
+                status.className = 'status success';
+                status.textContent = '✅ 检测到环境警告指示器';
+            } else {
+                status.className = 'status info';
+                status.textContent = 'ℹ️ 未检测到环境警告（可能不在生产环境）';
+            }
+        }
+        
+        // 检查清单功能
+        function checkAll() {
+            const checkboxes = document.querySelectorAll('#checklist input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+        }
+        
+        function uncheckAll() {
+            const checkboxes = document.querySelectorAll('#checklist input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+        
+        function showResults() {
+            const checkboxes = document.querySelectorAll('#checklist input[type="checkbox"]');
+            const total = checkboxes.length;
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            
+            const status = document.getElementById('testResults');
+            status.style.display = 'block';
+            
+            const percentage = Math.round((checked / total) * 100);
+            
+            if (percentage === 100) {
+                status.className = 'status success';
+                status.textContent = `🎉 测试完成度: ${percentage}% (${checked}/${total}) - 扩展功能完美！`;
+            } else if (percentage >= 75) {
+                status.className = 'status success';
+                status.textContent = `👍 测试完成度: ${percentage}% (${checked}/${total}) - 扩展功能良好`;
+            } else if (percentage >= 50) {
+                status.className = 'status info';
+                status.textContent = `⚠️ 测试完成度: ${percentage}% (${checked}/${total}) - 扩展部分功能正常`;
+            } else {
+                status.className = 'status error';
+                status.textContent = `❌ 测试完成度: ${percentage}% (${checked}/${total}) - 扩展需要检查`;
+            }
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认区域
+            simulateRegion('eu-west-2');
+            
+            // 检测扩展状态
+            setTimeout(() => {
+                const extensionStatus = document.getElementById('extensionStatus');
+                const indicator = document.querySelector('.aws-region-indicator');
+                
+                if (indicator) {
+                    extensionStatus.className = 'status success';
+                    extensionStatus.textContent = '✅ AWS Environment Browser Extension 已加载';
+                } else {
+                    extensionStatus.className = 'status error';
+                    extensionStatus.textContent = '❌ 扩展未检测到，请确认已正确安装';
+                }
+            }, 1000);
+        });
+        
+        // 监听快捷键
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.shiftKey) {
+                const status = document.getElementById('shortcutStatus');
+                status.style.display = 'block';
+                
+                if (event.key === 'R') {
+                    status.className = 'status success';
+                    status.textContent = '✅ Ctrl+Shift+R 快捷键响应正常';
+                } else if (event.key === 'E') {
+                    status.className = 'status success';
+                    status.textContent = '✅ Ctrl+Shift+E 快捷键响应正常';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
