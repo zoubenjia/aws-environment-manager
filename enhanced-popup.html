@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser</title>
+    <style>
+        body {
+            width: 380px;
+            min-height: 500px;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .environment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .environment-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .environment-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .environment-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .environment-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .environment-details {
+            flex: 1;
+        }
+        
+        .environment-name {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        
+        .environment-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .environment-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .color-picker, .edit-btn, .region-btn, .delete-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .region-btn {
+            background: rgba(116, 192, 252, 0.3);
+            border: 1px solid rgba(116, 192, 252, 0.6);
+        }
+        
+        .region-btn:hover {
+            background: rgba(116, 192, 252, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .color-picker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .color-picker:hover {
+            border-color: white;
+            transform: scale(1.1);
+        }
+        
+        .edit-btn, .delete-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            background: rgba(0, 123, 255, 0.8);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.8);
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background: rgba(0, 123, 255, 0.8);
+            border-color: rgba(0, 123, 255, 0.9);
+        }
+        
+        .btn-success {
+            background: rgba(40, 167, 69, 0.8);
+            border-color: rgba(40, 167, 69, 0.9);
+        }
+        
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.8);
+            border-color: rgba(220, 53, 69, 0.9);
+        }
+        
+        .tools-section {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .tool-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .tool-icon {
+            font-size: 16px;
+        }
+        
+        .tool-text {
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        
+        .status-error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+        
+        .status-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            color: #856404;
+        }
+        
+        .production-warning {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+            border: 2px solid #ff6b6b;
+        }
+        
+        .production-warning .warning-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .production-warning .warning-text {
+            font-size: 12px;
+            line-height: 1.4;
+            opacity: 0.95;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(220, 53, 69, 0.8);
+            }
+        }
+        
+        .color-customization {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+        
+        .color-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .color-input {
+            width: 40px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .color-label {
+            font-size: 11px;
+            flex: 1;
+        }
+        
+        .environment-form {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 12px;
+            box-sizing: border-box;
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+        
+        .region-settings {
+            margin-top: 10px;
+        }
+        
+        .region-color-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .region-color-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .region-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .region-flag {
+            font-size: 16px;
+        }
+        
+        .region-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .region-code {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        .region-color-picker {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .region-color-picker:hover {
+            border-color: white;
+            transform: scale(1.1);
+        }
+        
+        .region-selector select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 4px;
+        }
+        
+        .region-selector option {
+            background: #333;
+            color: white;
+        }
+        
+        /* 区域编辑弹窗样式 */
+        .region-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .region-modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .region-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .region-modal-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .region-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+        
+        .region-modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .region-modal-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .region-modal-body h4 {
+            margin: 0 0 10px 0;
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+        
+        .current-regions-list, .available-regions-list {
+            margin-bottom: 20px;
+        }
+        
+        .region-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .region-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(2px);
+        }
+        
+        .region-item.selected {
+            background: rgba(40, 167, 69, 0.3);
+            border-color: rgba(40, 167, 69, 0.6);
+        }
+        
+        .region-item-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .region-flag {
+            font-size: 16px;
+        }
+        
+        .region-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .region-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .region-code {
+            font-size: 10px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .region-action {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .region-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌍 AWS Environment Browser</h1>
+        <p>多环境管理与TST标签页颜色</p>
+    </div>
+
+    <div class="content">
+        <div id="statusMessage" class="status-message"></div>
+        
+        <div id="productionWarning" class="production-warning" style="display: none;">
+            <div class="warning-title">
+                ⚠️ 生产环境警告
+            </div>
+            <div class="warning-text">
+                您即将访问生产环境！<br>
+                请谨慎操作，确认所有变更。<br>
+                生产环境的任何操作都可能影响实际业务。
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>🎯</span>
+                <span>环境管理</span>
+            </div>
+            <div class="environment-list" id="environmentList">
+                <!-- 环境列表将通过JavaScript动态生成 -->
+            </div>
+            <div class="tools-section" style="margin-top: 15px;">
+                <button class="tool-btn" id="addEnvironment" onclick="handleAddEnvironment()">
+                    <span class="tool-icon">➕</span>
+                    <span class="tool-text">添加环境</span>
+                </button>
+                
+                <!-- 修复版添加按钮 -->
+                <button class="tool-btn" style="background: #fd7e14; margin-left: 5px;" 
+                        onclick="window.fixedAddEnvironment()">
+                    <span class="tool-icon">🔧</span>
+                    <span class="tool-text">修复添加</span>
+                </button>
+                
+                <!-- 内联添加按钮 -->
+                <button class="tool-btn" style="background: #17a2b8; margin-left: 5px;" 
+                        onclick="
+                            try {
+                                console.log('🔵 内联按钮被点击');
+                                const name = prompt('环境名称:', '内联环境 ' + new Date().toLocaleTimeString());
+                                if (!name) return;
+                                const env = {
+                                    id: 'inline_' + Date.now(),
+                                    name: name,
+                                    icon: '🔵',
+                                    color: '#17a2b8',
+                                    description: '内联按钮添加的环境',
+                                    accountId: '487783143761',
+                                    roleName: 'PowerUserAccess',
+                                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                                    regions: ['us-east-1']
+                                };
+                                console.log('创建环境:', env);
+                                if (typeof browser !== 'undefined' && browser.storage) {
+                                    browser.storage.local.get(['aws_environments']).then(result => {
+                                        let envs = result.aws_environments || [];
+                                        envs.push(env);
+                                        return browser.storage.local.set({'aws_environments': envs, 'save_timestamp': Date.now()});
+                                    }).then(() => {
+                                        alert('✅ 环境添加成功！请重新打开扩展。');
+                                        console.log('✅ 内联环境保存成功');
+                                    }).catch(err => {
+                                        console.error('❌ 内联保存失败:', err);
+                                        alert('❌ 保存失败: ' + err.message);
+                                    });
+                                } else {
+                                    alert('❌ 无法访问存储API');
+                                }
+                            } catch(e) {
+                                console.error('❌ 内联按钮错误:', e);
+                                alert('❌ 错误: ' + e.message);
+                            }
+                        ">
+                    <span class="tool-icon">🔵</span>
+                    <span class="tool-text">内联添加</span>
+                </button>
+            </div>
+            
+            <!-- 基础测试区域 -->
+            <div class="tools-section" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
+                <div style="color: rgba(255,255,255,0.8); font-size: 11px; margin-bottom: 8px;">基础测试工具:</div>
+                
+                <button class="tool-btn" style="background: #28a745; font-size: 10px; padding: 5px 8px; margin: 2px;" 
+                        onclick="window.testBasic()">
+                    ✅ 基础测试
+                </button>
+                
+                <button class="tool-btn" style="background: #007bff; font-size: 10px; padding: 5px 8px; margin: 2px;" 
+                        onclick="window.testBrowserAPI()">
+                    🔌 API测试
+                </button>
+                
+                <button class="tool-btn" style="background: #17a2b8; font-size: 10px; padding: 5px 8px; margin: 2px;" 
+                        onclick="window.testStorage()">
+                    💾 存储测试
+                </button>
+                
+                <button class="tool-btn" style="background: #6c757d; font-size: 10px; padding: 5px 8px; margin: 2px;" 
+                        onclick="window.viewStorage()">
+                    👁️ 查看存储
+                </button>
+                
+                <button class="tool-btn" style="background: #fd7e14; font-size: 10px; padding: 5px 8px; margin: 2px;" 
+                        onclick="window.simpleAddTest()">
+                    🧪 添加测试
+                </button>
+            </div>
+            
+            <!-- 调试工具区域 -->
+            <div class="tools-section" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
+                <div style="color: rgba(255,255,255,0.8); font-size: 11px; margin-bottom: 8px;">调试工具:</div>
+                
+                <button class="tool-btn" style="background: #6c757d; font-size: 11px; padding: 6px 10px; margin: 2px;" 
+                        onclick="window.debugStorage()">
+                    <span class="tool-icon">🔍</span>
+                    <span class="tool-text">调试存储</span>
+                </button>
+                
+                <button class="tool-btn" style="background: #dc3545; font-size: 11px; padding: 6px 10px; margin: 2px;" 
+                        onclick="window.clearStorage()">
+                    <span class="tool-icon">🗑️</span>
+                    <span class="tool-text">清理存储</span>
+                </button>
+                
+                <button class="tool-btn" style="background: #28a745; font-size: 11px; padding: 6px 10px; margin: 2px;" 
+                        onclick="window.resetToDefault()">
+                    <span class="tool-icon">🔄</span>
+                    <span class="tool-text">重置默认</span>
+                </button>
+            </div>
+            
+            <div id="environmentForm" class="environment-form">
+                <div class="form-group">
+                    <label class="form-label">环境名称</label>
+                    <input type="text" id="envName" class="form-input" placeholder="例如: 预发布环境">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">环境图标</label>
+                    <input type="text" id="envIcon" class="form-input" placeholder="例如: 🟡" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">环境颜色</label>
+                    <input type="color" id="envColor" class="color-input" value="#ffc107">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">环境描述</label>
+                    <input type="text" id="envDescription" class="form-input" placeholder="例如: 预发布环境 - 最终验证">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">AWS账号ID</label>
+                    <input type="text" id="envAccountId" class="form-input" placeholder="例如: 487783143761">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">AWS区域</label>
+                    <div class="region-selector">
+                        <select id="envRegions" class="form-input" multiple size="4">
+                            <option value="us-east-1">🇺🇸 美国东部 (北弗吉尼亚) - us-east-1</option>
+                            <option value="us-east-2">🇺🇸 美国东部 (俄亥俄) - us-east-2</option>
+                            <option value="us-west-1">🇺🇸 美国西部 (加利福尼亚) - us-west-1</option>
+                            <option value="us-west-2">🇺🇸 美国西部 (俄勒冈) - us-west-2</option>
+                            <option value="eu-west-1">🇪🇺 欧洲 (爱尔兰) - eu-west-1</option>
+                            <option value="eu-west-2">🇪🇺 欧洲 (伦敦) - eu-west-2</option>
+                            <option value="eu-central-1">🇪🇺 欧洲 (法兰克福) - eu-central-1</option>
+                            <option value="ap-southeast-1">🇸🇬 亚太 (新加坡) - ap-southeast-1</option>
+                            <option value="ap-northeast-1">🇯🇵 亚太 (东京) - ap-northeast-1</option>
+                            <option value="ap-south-1">🇮🇳 亚太 (孟买) - ap-south-1</option>
+                        </select>
+                        <small style="color: rgba(255,255,255,0.8); font-size: 10px; margin-top: 5px; display: block;">
+                            按住Ctrl/Cmd选择多个区域
+                        </small>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn" id="cancelEnvironment">取消</button>
+                    <button class="btn btn-success" id="saveEnvironment">保存环境</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 区域编辑弹窗 -->
+        <div id="regionEditModal" class="region-modal" style="display: none;">
+            <div class="region-modal-content">
+                <div class="region-modal-header">
+                    <h3 id="regionModalTitle">编辑环境区域</h3>
+                    <button class="region-modal-close" id="closeRegionModal">×</button>
+                </div>
+                <div class="region-modal-body">
+                    <div class="current-regions">
+                        <h4>当前区域:</h4>
+                        <div id="currentRegionsList" class="current-regions-list">
+                            <!-- 当前区域列表 -->
+                        </div>
+                    </div>
+                    <div class="available-regions">
+                        <h4>可用区域:</h4>
+                        <div id="availableRegionsList" class="available-regions-list">
+                            <!-- 可用区域列表 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="region-modal-footer">
+                    <button class="btn" id="cancelRegionEdit">取消</button>
+                    <button class="btn btn-success" id="saveRegionEdit">保存区域设置</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>🎨</span>
+                <span>颜色设置</span>
+            </div>
+            <div class="tools-section">
+                <button class="tool-btn" id="customizeColors">
+                    <span class="tool-icon">🎨</span>
+                    <span class="tool-text">自定义颜色</span>
+                </button>
+                <button class="tool-btn" id="resetColors">
+                    <span class="tool-icon">🔄</span>
+                    <span class="tool-text">重置颜色</span>
+                </button>
+            </div>
+            
+            <div id="colorCustomization" class="color-customization">
+                <div id="colorInputs">
+                    <!-- 颜色输入将动态生成 -->
+                </div>
+                <button class="btn btn-success" id="saveColors">保存颜色设置</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                <span>🔧</span>
+                <span>工具</span>
+            </div>
+            <div class="tools-section">
+                <button class="tool-btn" id="refreshContainers">
+                    <span class="tool-icon">🔄</span>
+                    <span class="tool-text">刷新环境</span>
+                </button>
+                <button class="tool-btn" id="setupTST">
+                    <span class="tool-icon">🎨</span>
+                    <span class="tool-text">自动设置TST</span>
+                </button>
+                <button class="tool-btn" id="debugData">
+                    <span class="tool-icon">🐛</span>
+                    <span class="tool-text">调试数据</span>
+                </button>
+                <button class="tool-btn" id="saveEnvironments">
+                    <span class="tool-icon">💾</span>
+                    <span class="tool-text">保存环境</span>
+                </button>
+                <button class="tool-btn" id="openOptions">
+                    <span class="tool-icon">⚙️</span>
+                    <span class="tool-text">扩展设置</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data-sync-manager.js"></script>
+    <script src="safe-popup.js"></script>
+    <script src="reliable-fix.js"></script>
+    <script src="storage-debug.js"></script>
+    <script src="basic-test.js"></script>
+    
+    <script>
+        // 全局内联事件处理函数
+        function handleAddEnvironment() {
+            console.log('🎯 添加环境函数被调用');
+            
+            try {
+                // 第一步：基本信息
+                const envName = prompt('请输入环境名称:', '');
+                if (!envName || envName.trim() === '') {
+                    console.log('用户取消或未输入环境名称');
+                    return;
+                }
+                
+                const envDesc = prompt('请输入环境描述:', '自定义环境');
+                if (envDesc === null) return;
+                
+                const envIcon = prompt('请输入环境图标 (emoji):', '🟡');
+                if (envIcon === null) return;
+                
+                const envColor = prompt('请输入环境颜色 (如 #ff0000):', '#ffc107');
+                if (envColor === null) return;
+                
+                // 第二步：AWS配置
+                const configAWS = confirm('是否配置AWS SSO？\n\n点击"确定"配置AWS信息\n点击"取消"跳过AWS配置');
+                
+                let awsConfig = {};
+                if (configAWS) {
+                    const accountId = prompt('请输入AWS账号ID:', '487783143761');
+                    if (accountId === null) return;
+                    
+                    const roleName = prompt('请输入角色名称:', 'PowerUserAccess');
+                    if (roleName === null) return;
+                    
+                    const ssoUrl = prompt('请输入SSO起始URL:', 'https://d-9067f2e3cc.awsapps.com/start/#/console');
+                    if (ssoUrl === null) return;
+                    
+                    awsConfig = {
+                        accountId: accountId.trim(),
+                        roleName: roleName.trim(),
+                        ssoStartUrl: ssoUrl.trim()
+                    };
+                }
+                
+                // 第三步：区域配置
+                const configRegions = confirm('是否配置AWS区域？\n\n点击"确定"选择区域\n点击"取消"使用默认区域(us-east-1)');
+                
+                let regions = ['us-east-1'];
+                if (configRegions) {
+                    const regionInput = prompt(
+                        '可用区域:\n' +
+                        '1. us-east-1 (美国东部-北弗吉尼亚)\n' +
+                        '2. us-east-2 (美国东部-俄亥俄)\n' +
+                        '3. us-west-1 (美国西部-加利福尼亚)\n' +
+                        '4. us-west-2 (美国西部-俄勒冈)\n' +
+                        '5. eu-west-1 (欧洲-爱尔兰)\n' +
+                        '6. eu-west-2 (欧洲-伦敦)\n' +
+                        '7. eu-central-1 (欧洲-法兰克福)\n' +
+                        '8. ap-southeast-1 (亚太-新加坡)\n' +
+                        '9. ap-northeast-1 (亚太-东京)\n' +
+                        '10. ap-south-1 (亚太-孟买)\n\n' +
+                        '请输入区域代码，用逗号分隔 (如: us-east-1,eu-west-2):',
+                        'us-east-1'
+                    );
+                    
+                    if (regionInput === null) return;
+                    
+                    if (regionInput.trim()) {
+                        regions = regionInput.split(',').map(r => r.trim()).filter(r => r.length > 0);
+                    }
+                }
+                
+                // 创建新环境
+                const newEnv = {
+                    id: 'custom_' + Date.now(),
+                    name: envName.trim(),
+                    icon: envIcon.trim() || '🟡',
+                    color: envColor.trim() || '#ffc107',
+                    description: envDesc.trim() || '自定义环境',
+                    regions: regions,
+                    ...awsConfig
+                };
+                
+                // 最终确认
+                let confirmMsg = `确认添加以下环境？\n\n`;
+                confirmMsg += `名称: ${newEnv.name}\n`;
+                confirmMsg += `描述: ${newEnv.description}\n`;
+                confirmMsg += `图标: ${newEnv.icon}\n`;
+                confirmMsg += `颜色: ${newEnv.color}\n`;
+                confirmMsg += `区域: ${newEnv.regions.join(', ')}\n`;
+                
+                if (newEnv.accountId) {
+                    confirmMsg += `\nAWS配置:\n`;
+                    confirmMsg += `账号ID: ${newEnv.accountId}\n`;
+                    confirmMsg += `角色: ${newEnv.roleName}\n`;
+                    confirmMsg += `SSO: ${newEnv.ssoStartUrl ? '已配置' : '未配置'}\n`;
+                }
+                
+                const finalConfirm = confirm(confirmMsg);
+                if (!finalConfirm) {
+                    console.log('用户取消添加环境');
+                    return;
+                }
+                
+                console.log('创建新环境:', newEnv);
+                
+                // 保存到存储
+                if (typeof browser !== 'undefined' && browser.storage) {
+                    browser.storage.local.get(['aws_environments']).then(result => {
+                        let environments = result.aws_environments || [];
+                        environments.push(newEnv);
+                        return browser.storage.local.set({
+                            'aws_environments': environments,
+                            'save_timestamp': Date.now()
+                        });
+                    }).then(() => {
+                        alert('✅ 环境添加成功！\n\n请重新打开扩展查看新环境。');
+                        console.log('环境添加成功');
+                        
+                        // 尝试刷新当前页面的环境列表
+                        if (window.location) {
+                            window.location.reload();
+                        }
+                    }).catch(error => {
+                        console.error('保存环境失败:', error);
+                        alert('❌ 保存失败: ' + error.message);
+                    });
+                } else {
+                    alert('❌ 无法访问浏览器存储API');
+                }
+                
+            } catch (error) {
+                console.error('添加环境失败:', error);
+                alert('❌ 添加环境失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
