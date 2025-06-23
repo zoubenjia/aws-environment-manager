@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Environment Browser</title>
+    <style>
+        body {
+            width: 380px;
+            min-height: 450px;
+            margin: 0;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -moz-system-ui, system-ui, sans-serif;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .header h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+        }
+        
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        
+        .section {
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .env-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            margin: 4px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+        }
+        
+        .env-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(2px);
+        }
+        
+        .env-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .env-icon {
+            font-size: 16px;
+        }
+        
+        .env-name {
+            font-weight: 600;
+        }
+        
+        .env-desc {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin: 8px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3>🚀 AWS Environment Browser</h3>
+        <p>Firefox安全版本</p>
+    </div>
+    
+    <div class="status" id="status">
+        状态：正在初始化...
+    </div>
+    
+    <div class="section">
+        <div class="section-title">基础测试</div>
+        
+        <button class="btn btn-success" id="testBtn1">
+            ✅ JavaScript测试
+        </button>
+        
+        <button class="btn btn-info" id="testBtn2">
+            🔌 API测试
+        </button>
+        
+        <button class="btn btn-primary" id="viewStorageBtn">
+            👁️ 查看存储
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">环境管理</div>
+        
+        <button class="btn btn-warning" id="addEnvBtn">
+            ➕ 添加环境
+        </button>
+        
+        <button class="btn btn-success" id="resetBtn">
+            🔄 重置默认
+        </button>
+        
+        <button class="btn btn-danger" id="clearBtn">
+            🗑️ 清理存储
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">环境列表</div>
+        <div id="environmentList">
+            <div style="text-align: center; opacity: 0.7; font-size: 11px;">加载中...</div>
+        </div>
+    </div>
+    
+    <script src="firefox-popup-script.js"></script>
+</body>
+</html>
