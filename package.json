@@ -1,0 +1,35 @@
+{
+  "name": "aws-environment-manager",
+  "version": "1.0.2",
+  "description": "功能强大的Firefox扩展，用于管理AWS多环境访问，支持容器隔离和TST集成",
+  "main": "popup.js",
+  "scripts": {
+    "upload": "node github-api-upload.js",
+    "build": "echo 'Building extension...' && zip -r aws-environment-manager.zip . -x '*.git*' 'node_modules/*' '*.log' 'github-api-upload.js' 'package*.json'",
+    "test": "echo 'Testing extension...' && node -e 'console.log(\"Extension files check:\"); require(\"fs\").readdirSync(\".\").forEach(f => console.log(f));'",
+    "clean": "rm -f *.zip *.log"
+  },
+  "keywords": [
+    "firefox-extension",
+    "aws",
+    "containers",
+    "tree-style-tab",
+    "multi-account",
+    "browser-extension"
+  ],
+  "author": "Ben",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_USERNAME/aws-environment-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/aws-environment-manager/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/aws-environment-manager#readme",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
