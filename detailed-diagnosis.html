@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>详细诊断</title>
+</head>
+<body style="width: 400px; height: 600px; padding: 20px; background: #f8f9fa; font-family: Arial, sans-serif; font-size: 14px;">
+    <h3>🔍 Firefox JavaScript详细诊断</h3>
+    
+    <div id="status" style="background: #ffcccc; padding: 10px; margin: 10px 0; border-radius: 4px; font-weight: bold;">
+        JavaScript状态：检测中...
+    </div>
+    
+    <div id="info" style="background: #e9ecef; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 12px; line-height: 1.4;">
+        浏览器信息加载中...
+    </div>
+    
+    <button onclick="runDiagnosis()" style="width: 100%; padding: 12px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+        🔍 运行完整诊断
+    </button>
+    
+    <button onclick="testBasicJS()" style="width: 100%; padding: 12px; margin: 10px 0; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+        ✅ 测试基础JavaScript
+    </button>
+    
+    <button onclick="testConsole()" style="width: 100%; padding: 12px; margin: 10px 0; background: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+        📝 测试控制台
+    </button>
+    
+    <div id="results" style="background: #fff; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #ddd; max-height: 200px; overflow-y: auto; font-size: 12px;">
+        诊断结果将显示在这里...
+    </div>
+    
+    <div style="background: #d1ecf1; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 12px;">
+        <strong>诊断说明：</strong><br>
+        1. 如果看到这个页面但按钮无效 → JavaScript被阻止<br>
+        2. 如果按钮有效但扩展无效 → 扩展权限问题<br>
+        3. 请按F12打开开发者工具查看错误信息
+    </div>
+    
+    <script>
+        console.log('🔍 详细诊断脚本开始执行');
+        
+        // 立即更新状态
+        function updateStatus() {
+            const statusEl = document.getElementById('status');
+            const infoEl = document.getElementById('info');
+            
+            if (statusEl) {
+                statusEl.innerHTML = 'JavaScript状态：✅ 正常执行 - ' + new Date().toLocaleString();
+                statusEl.style.background = '#ccffcc';
+            }
+            
+            if (infoEl) {
+                let info = '浏览器信息：<br>';
+                info += '• 用户代理: ' + navigator.userAgent + '<br>';
+                info += '• 语言: ' + navigator.language + '<br>';
+                info += '• 平台: ' + navigator.platform + '<br>';
+                info += '• Cookie启用: ' + navigator.cookieEnabled + '<br>';
+                info += '• 在线状态: ' + navigator.onLine + '<br>';
+                info += '• 页面URL: ' + window.location.href + '<br>';
+                info += '• 文档状态: ' + document.readyState + '<br>';
+                infoEl.innerHTML = info;
+            }
+        }
+        
+        // 运行完整诊断
+        function runDiagnosis() {
+            console.log('🔍 运行完整诊断');
+            const resultsEl = document.getElementById('results');
+            
+            let results = '完整诊断结果：<br><br>';
+            
+            // 基础JavaScript功能
+            try {
+                const testDate = new Date();
+                results += '✅ Date对象: 正常 (' + testDate.toLocaleString() + ')<br>';
+            } catch (e) {
+                results += '❌ Date对象: 失败 - ' + e.message + '<br>';
+            }
+            
+            // JSON功能
+            try {
+                const testObj = {test: 'value'};
+                const jsonStr = JSON.stringify(testObj);
+                results += '✅ JSON: 正常 (' + jsonStr + ')<br>';
+            } catch (e) {
+                results += '❌ JSON: 失败 - ' + e.message + '<br>';
+            }
+            
+            // DOM操作
+            try {
+                const testDiv = document.createElement('div');
+                testDiv.innerHTML = 'test';
+                results += '✅ DOM操作: 正常<br>';
+            } catch (e) {
+                results += '❌ DOM操作: 失败 - ' + e.message + '<br>';
+            }
+            
+            // 事件处理
+            try {
+                const testHandler = function() { return true; };
+                results += '✅ 事件处理: 正常<br>';
+            } catch (e) {
+                results += '❌ 事件处理: 失败 - ' + e.message + '<br>';
+            }
+            
+            // 异步功能
+            try {
+                setTimeout(function() {
+                    console.log('异步测试完成');
+                }, 100);
+                results += '✅ 异步功能: 正常<br>';
+            } catch (e) {
+                results += '❌ 异步功能: 失败 - ' + e.message + '<br>';
+            }
+            
+            // 存储API
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem('test', 'value');
+                    localStorage.removeItem('test');
+                    results += '✅ localStorage: 正常<br>';
+                } else {
+                    results += '⚠️ localStorage: 不可用<br>';
+                }
+            } catch (e) {
+                results += '❌ localStorage: 失败 - ' + e.message + '<br>';
+            }
+            
+            results += '<br>诊断完成时间: ' + new Date().toLocaleString();
+            
+            if (resultsEl) {
+                resultsEl.innerHTML = results;
+            }
+            
+            alert('完整诊断已完成！请查看结果区域。');
+        }
+        
+        // 测试基础JavaScript
+        function testBasicJS() {
+            console.log('✅ 测试基础JavaScript');
+            alert('✅ 基础JavaScript测试成功！\n\n如果您看到这个弹窗，说明JavaScript基本功能正常。');
+        }
+        
+        // 测试控制台
+        function testConsole() {
+            console.log('📝 控制台测试开始');
+            console.log('这是一条普通日志');
+            console.warn('这是一条警告日志');
+            console.error('这是一条错误日志（测试用）');
+            console.info('这是一条信息日志');
+            console.log('📝 控制台测试完成');
+            alert('📝 控制台测试完成！\n\n请按F12打开开发者工具，查看控制台标签页中的日志信息。');
+        }
+        
+        // 页面加载完成后立即执行
+        document.addEventListener('DOMContentLoaded', updateStatus);
+        
+        // 如果DOM已经加载完成，立即执行
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            updateStatus();
+        }
+        
+        console.log('🔍 详细诊断脚本执行完成');
+    </script>
+</body>
+</html>
