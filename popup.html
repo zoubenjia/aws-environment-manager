@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Environment Manager</title>
+    <link rel="stylesheet" href="popup-fixed.css">
+    <link rel="stylesheet" href="region-styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3>🚀 AWS Environment Manager</h3>
+        </div>
+        
+        <div class="status" id="status">
+            状态：初始化中...
+        </div>
+        
+        <div class="buttons">
+            <button id="addBtn" class="btn btn-add">
+                ➕ 添加环境
+            </button>
+            
+            <button id="addContainerBtn" class="btn" style="background: #17a2b8; color: white;">
+                📦 容器状态
+            </button>
+            
+            <button id="viewBtn" class="btn btn-view">
+                👁️ 查看环境
+            </button>
+            
+            <button id="resetBtn" class="btn btn-reset">
+                🔄 重置默认
+            </button>
+            
+            <button id="fixColorsBtn" class="btn" style="background: #6f42c1; color: white; font-size: 12px; padding: 8px;">
+                🎨 修复颜色
+            </button>
+            
+            <button id="tstConfigBtn" class="btn" style="background: #20c997; color: white; font-size: 12px; padding: 8px;">
+                🌳 TST配置
+            </button>
+            
+            <button id="clipboardBtn" class="btn" style="background: #fd7e14; color: white; font-size: 12px; padding: 8px;">
+                📋 剪贴板
+            </button>
+            
+            <button id="debugTSTBtn" class="btn" style="background: #e83e8c; color: white; font-size: 12px; padding: 8px;">
+                🔍 TST调试
+            </button>
+            
+            <button id="forceTSTBtn" class="btn" style="background: #dc3545; color: white; font-size: 12px; padding: 8px;">
+                🔧 强制写入
+            </button>
+            
+            <button id="immediateApplyBtn" class="btn" style="background: #28a745; color: white; font-size: 12px; padding: 8px;">
+                ⚡ 立即应用
+            </button>
+        </div>
+        
+        <div class="env-list" id="envList">
+            <!-- 环境列表将在这里显示 -->
+        </div>
+    </div>
+    
+    <!-- 修复定位的自定义对话框 -->
+    <div id="customDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box">
+            <div class="dialog-header">
+                <span id="dialogTitle">提示</span>
+                <button id="dialogClose" class="dialog-close">×</button>
+            </div>
+            <div class="dialog-content" id="dialogContent">
+                <!-- 对话框内容 -->
+            </div>
+            <div class="dialog-buttons">
+                <button id="dialogOk" class="dialog-btn dialog-btn-ok">确定</button>
+                <button id="dialogCancel" class="dialog-btn dialog-btn-cancel" style="display: none;">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 修改环境对话框 -->
+    <div id="editDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-box" style="width: 360px;">
+            <div class="dialog-header">
+                <span>✏️ 修改环境</span>
+                <button id="editDialogClose" class="dialog-close">×</button>
+            </div>
+            <div class="dialog-content" style="padding: 20px;">
+                <div class="form-group">
+                    <label for="editName">环境名称:</label>
+                    <input type="text" id="editName" class="form-input" placeholder="请输入环境名称">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editDescription">环境描述:</label>
+                    <input type="text" id="editDescription" class="form-input" placeholder="请输入环境描述">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editIcon">环境图标:</label>
+                    <select id="editIcon" class="form-input">
+                        <option value="🆕">🆕 新环境</option>
+                        <option value="🔴">🔴 生产环境</option>
+                        <option value="🟢">🟢 开发环境</option>
+                        <option value="🔵">🔵 测试环境</option>
+                        <option value="🟡">🟡 预发布</option>
+                        <option value="🟠">🟠 演示环境</option>
+                        <option value="🟣">🟣 实验环境</option>
+                        <option value="⚫">⚫ 维护环境</option>
+                        <option value="🔹">🔹 默认</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editColor">环境颜色:</label>
+                    <select id="editColor" class="form-input">
+                        <option value="#28a745">🟢 绿色 (开发)</option>
+                        <option value="#dc3545">🔴 红色 (生产)</option>
+                        <option value="#007bff">🔵 蓝色 (测试)</option>
+                        <option value="#ffc107">🟡 黄色 (预发布)</option>
+                        <option value="#fd7e14">🟠 橙色 (演示)</option>
+                        <option value="#6f42c1">🟣 紫色 (实验)</option>
+                        <option value="#6c757d">⚫ 灰色 (维护)</option>
+                        <option value="#17a2b8">🔹 青色 (默认)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editAccountId">账户ID:</label>
+                    <input type="text" id="editAccountId" class="form-input" placeholder="AWS账户ID">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editRoleName">角色名称:</label>
+                    <input type="text" id="editRoleName" class="form-input" placeholder="IAM角色名称">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editRegions">AWS区域:</label>
+                    <div class="region-selector">
+                        <select id="editPrimaryRegion" class="form-input" style="margin-bottom: 8px;">
+                            <option value="">选择主要区域</option>
+                            <option value="us-east-1">🇺🇸 us-east-1 (N. Virginia)</option>
+                            <option value="us-east-2">🇺🇸 us-east-2 (Ohio)</option>
+                            <option value="us-west-1">🇺🇸 us-west-1 (N. California)</option>
+                            <option value="us-west-2">🇺🇸 us-west-2 (Oregon)</option>
+                            <option value="eu-west-1">🇪🇺 eu-west-1 (Ireland)</option>
+                            <option value="eu-west-2">🇪🇺 eu-west-2 (London)</option>
+                            <option value="eu-west-3">🇪🇺 eu-west-3 (Paris)</option>
+                            <option value="eu-central-1">🇪🇺 eu-central-1 (Frankfurt)</option>
+                            <option value="eu-north-1">🇪🇺 eu-north-1 (Stockholm)</option>
+                            <option value="ap-southeast-1">🇦🇸 ap-southeast-1 (Singapore)</option>
+                            <option value="ap-southeast-2">🇦🇸 ap-southeast-2 (Sydney)</option>
+                            <option value="ap-northeast-1">🇦🇸 ap-northeast-1 (Tokyo)</option>
+                            <option value="ap-northeast-2">🇦🇸 ap-northeast-2 (Seoul)</option>
+                            <option value="ap-south-1">🇦🇸 ap-south-1 (Mumbai)</option>
+                            <option value="ca-central-1">🇨🇦 ca-central-1 (Canada)</option>
+                            <option value="sa-east-1">🇧🇷 sa-east-1 (São Paulo)</option>
+                        </select>
+                        
+                        <div class="region-checkboxes" style="max-height: 120px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 8px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 6px;">选择额外区域 (可多选):</div>
+                            
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="us-east-1"> 🇺🇸 us-east-1 (N. Virginia)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="us-east-2"> 🇺🇸 us-east-2 (Ohio)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="us-west-1"> 🇺🇸 us-west-1 (N. California)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="us-west-2"> 🇺🇸 us-west-2 (Oregon)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="eu-west-1"> 🇪🇺 eu-west-1 (Ireland)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="eu-west-2"> 🇪🇺 eu-west-2 (London)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="eu-west-3"> 🇪🇺 eu-west-3 (Paris)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="eu-central-1"> 🇪🇺 eu-central-1 (Frankfurt)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="eu-north-1"> 🇪🇺 eu-north-1 (Stockholm)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ap-southeast-1"> 🇦🇸 ap-southeast-1 (Singapore)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ap-southeast-2"> 🇦🇸 ap-southeast-2 (Sydney)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ap-northeast-1"> 🇦🇸 ap-northeast-1 (Tokyo)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ap-northeast-2"> 🇦🇸 ap-northeast-2 (Seoul)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ap-south-1"> 🇦🇸 ap-south-1 (Mumbai)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="ca-central-1"> 🇨🇦 ca-central-1 (Canada)
+                            </label>
+                            <label class="region-checkbox">
+                                <input type="checkbox" value="sa-east-1"> 🇧🇷 sa-east-1 (São Paulo)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editSsoUrl">SSO起始URL:</label>
+                    <input type="text" id="editSsoUrl" class="form-input" placeholder="https://d-xxxxxxxxxx.awsapps.com/start/#/console">
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button id="editDialogSave" class="dialog-btn dialog-btn-ok">💾 保存</button>
+                <button id="editDialogCancel" class="dialog-btn dialog-btn-cancel">取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup-layout-fix.js"></script>
+    <script src="popup.js"></script>
+    <script src="edit-functions.js"></script>
+    <script src="region-handler.js"></script>
+    <script src="debug-colors.js"></script>
+    <script src="firefox-containers.js"></script>
+    <script src="tst-config-generator.js"></script>
+    <script src="dynamic-tst-css.js"></script>
+    <script src="safe-tst-css.js"></script>
+    <script src="auto-copy-paste.js"></script>
+    <script src="auto-paste-tst.js"></script>
+    <script src="tst-debug.js"></script>
+    <script src="force-auto-tst.js"></script>
+    <link rel="stylesheet" href="region-styles.css">
+</body>
+</html>
