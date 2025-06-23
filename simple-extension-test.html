@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Extension Test</title>
+</head>
+<body style="width: 300px; height: 200px; padding: 20px;">
+    <h3>扩展测试</h3>
+    <div id="status">加载中...</div>
+    <button id="testBtn" style="width: 100%; padding: 10px; margin: 10px 0;">点击测试</button>
+    
+    <script>
+        // 立即执行
+        document.getElementById('status').innerHTML = 'JavaScript已执行：' + new Date().toLocaleString();
+        
+        // 绑定事件
+        document.getElementById('testBtn').onclick = function() {
+            alert('按钮点击成功！');
+            document.getElementById('status').innerHTML = '按钮测试成功：' + new Date().toLocaleString();
+        };
+        
+        console.log('扩展脚本执行完成');
+    </script>
+</body>
+</html>
