@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 设置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            font-weight: 500;
+        }
+        
+        .setting-description {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #4ecdc4;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+        
+        .save-button {
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .save-button:hover {
+            background: #45b7d1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser 设置</h1>
+        <p>配置您的AWS环境浏览器扩展</p>
+    </div>
+
+    <div class="section">
+        <h2>🔧 基本设置</h2>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">自动环境检测</div>
+                <div class="setting-description">自动检测并标识AWS区域和环境</div>
+            </div>
+            <div class="toggle-switch active" data-setting="autoDetection">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">显示区域颜色</div>
+                <div class="setting-description">在AWS控制台导航栏显示区域颜色标识</div>
+            </div>
+            <div class="toggle-switch active" data-setting="showRegionColors">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">显示环境图标</div>
+                <div class="setting-description">在页面右上角显示环境指示器</div>
+            </div>
+            <div class="toggle-switch active" data-setting="showEnvironmentIcons">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <div>
+                <div class="setting-label">生产环境警告</div>
+                <div class="setting-description">访问生产环境时显示确认提示</div>
+            </div>
+            <div class="toggle-switch active" data-setting="productionWarning">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🌍 环境配置</h2>
+        <p>当前环境配置：</p>
+        <ul>
+            <li>🔴 <strong>生产环境</strong>：伦敦 (eu-west-2)、北弗吉尼亚 (us-east-1)</li>
+            <li>🟢 <strong>开发环境</strong>：法兰克福 (eu-central-1)、俄勒冈 (us-west-2)</li>
+            <li>🔵 <strong>测试环境</strong>：新加坡 (ap-southeast-1)、东京 (ap-northeast-1)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>⌨️ 快捷键</h2>
+        <ul>
+            <li><code>Ctrl+Shift+E</code> - 打开环境切换器</li>
+            <li><code>Ctrl+Shift+R</code> - 显示区域信息</li>
+            <li><code>1-3</code> - 在弹出窗口中快速选择环境</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="save-button" id="saveSettings">保存设置</button>
+    </div>
+
+    <script>
+        // 加载设置
+        async function loadSettings() {
+            const settings = await browser.storage.local.get([
+                'autoDetection',
+                'showRegionColors', 
+                'showEnvironmentIcons',
+                'productionWarning'
+            ]);
+            
+            Object.keys(settings).forEach(key => {
+                const toggle = document.querySelector(`[data-setting="${key}"]`);
+                if (toggle) {
+                    toggle.classList.toggle('active', settings[key] !== false);
+                }
+            });
+        }
+        
+        // 保存设置
+        async function saveSettings() {
+            const settings = {};
+            
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                const setting = toggle.dataset.setting;
+                settings[setting] = toggle.classList.contains('active');
+            });
+            
+            await browser.storage.local.set(settings);
+            
+            // 显示保存成功
+            const button = document.getElementById('saveSettings');
+            const originalText = button.textContent;
+            button.textContent = '✅ 已保存';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#4ecdc4';
+            }, 2000);
+        }
+        
+        // 绑定事件
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                toggle.classList.toggle('active');
+            });
+        });
+        
+        document.getElementById('saveSettings').addEventListener('click', saveSettings);
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html>
