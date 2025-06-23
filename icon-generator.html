@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 图标生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .description {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .generate-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .generate-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .preview-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .icon-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .icon-item {
+            text-align: center;
+            margin: 10px;
+        }
+        
+        .icon-item canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 8px;
+        }
+        
+        .icon-size {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .success-message {
+            background: rgba(40, 167, 69, 0.3);
+            border: 1px solid rgba(40, 167, 69, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 AWS Environment Browser</h1>
+        <h2>扩展图标生成器</h2>
+        
+        <div class="description">
+            点击下面的按钮，我将为您生成专业的扩展图标<br>
+            包含 16×16、32×32、48×48、128×128 四种尺寸
+        </div>
+        
+        <button class="generate-btn" onclick="generateIcons()">
+            🚀 生成扩展图标
+        </button>
+        
+        <div id="previewArea" class="preview-area">
+            <h3>📱 图标预览</h3>
+            <div id="iconPreview" class="icon-preview"></div>
+            <div id="successMessage" class="success-message" style="display: none;">
+                ✅ 图标已生成并自动下载！请检查您的下载文件夹。
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 使用说明</h3>
+            <ol>
+                <li>点击"生成扩展图标"按钮</li>
+                <li>浏览器会自动下载4个PNG图标文件</li>
+                <li>将图标文件放入扩展的 <code>icons/</code> 文件夹</li>
+                <li>在 <code>manifest.json</code> 中引用这些图标</li>
+                <li>重新载入扩展即可看到新图标</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 添加 roundRect polyfill
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+        
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变 - AWS主题色
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#FF9900'); // AWS橙色
+            gradient.addColorStop(0.5, '#667eea'); // 蓝紫色
+            gradient.addColorStop(1, '#764ba2'); // 深紫色
+            
+            // 绘制圆角背景
+            const radius = size * 0.15;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, radius);
+            ctx.fill();
+            
+            // 绘制AWS环境图标
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (size >= 48) {
+                // 大图标：云朵 + 环境切换箭头
+                ctx.font = `${size * 0.35}px Arial`;
+                ctx.fillText('☁️', size/2, size/2 - size*0.12);
+                
+                // 环境切换箭头
+                ctx.font = `${size * 0.2}px Arial`;
+                ctx.fillText('🔄', size/2, size/2 + size*0.15);
+                
+                // AWS标识
+                ctx.font = `bold ${size * 0.12}px Arial`;
+                ctx.fillText('AWS', size/2, size/2 + size*0.32);
+            } else if (size >= 32) {
+                // 中图标：云朵 + 箭头
+                ctx.font = `${size * 0.4}px Arial`;
+                ctx.fillText('☁️', size/2, size/2 - size*0.08);
+                
+                ctx.font = `${size * 0.25}px Arial`;
+                ctx.fillText('🔄', size/2, size/2 + size*0.2);
+            } else {
+                // 小图标：只显示云朵
+                ctx.font = `${size * 0.6}px Arial`;
+                ctx.fillText('☁️', size/2, size/2);
+            }
+            
+            // 添加光泽效果
+            const glossGradient = ctx.createLinearGradient(0, 0, 0, size * 0.6);
+            glossGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+            glossGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glossGradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size * 0.6, radius);
+            ctx.fill();
+            
+            // 边框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = size >= 48 ? 2 : 1;
+            ctx.beginPath();
+            ctx.roundRect(ctx.lineWidth/2, ctx.lineWidth/2, size - ctx.lineWidth, size - ctx.lineWidth, radius);
+            ctx.stroke();
+            
+            return canvas;
+        }
+        
+        function generateIcons() {
+            const sizes = [16, 32, 48, 128];
+            const previewArea = document.getElementById('previewArea');
+            const iconPreview = document.getElementById('iconPreview');
+            const successMessage = document.getElementById('successMessage');
+            
+            // 清空预览区域
+            iconPreview.innerHTML = '';
+            previewArea.style.display = 'block';
+            successMessage.style.display = 'none';
+            
+            console.log('🎨 开始生成AWS Environment Browser扩展图标...');
+            
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    // 创建图标
+                    const canvas = createIcon(size);
+                    
+                    // 添加到预览
+                    const iconItem = document.createElement('div');
+                    iconItem.className = 'icon-item';
+                    
+                    const previewCanvas = createIcon(size);
+                    const sizeLabel = document.createElement('div');
+                    sizeLabel.className = 'icon-size';
+                    sizeLabel.textContent = `${size}×${size}px`;
+                    
+                    iconItem.appendChild(previewCanvas);
+                    iconItem.appendChild(sizeLabel);
+                    iconPreview.appendChild(iconItem);
+                    
+                    // 下载图标
+                    const link = document.createElement('a');
+                    link.download = `icon-${size}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                    
+                    console.log(`✅ 生成并下载图标: icon-${size}.png`);
+                    
+                    // 最后一个图标生成完成
+                    if (index === sizes.length - 1) {
+                        setTimeout(() => {
+                            successMessage.style.display = 'block';
+                            console.log('🎉 所有图标生成完成！');
+                        }, 500);
+                    }
+                }, index * 300); // 延迟下载，避免浏览器阻止
+            });
+        }
+    </script>
+</body>
+</html>
