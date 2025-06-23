@@ -1,0 +1,187 @@
+/* Tree Style Tab 容器颜色适配 CSS */
+/* 让TST标签页颜色跟随Firefox容器颜色变化 */
+
+/* AWS生产环境容器 - 红色 */
+.tab[data-contextual-identity-name*="AWS-生产环境"],
+.tab[data-contextual-identity-color="red"] {
+    --tab-surface: rgba(220, 53, 69, 0.1) !important;
+    --tab-surface-hover: rgba(220, 53, 69, 0.2) !important;
+    --tab-surface-active: rgba(220, 53, 69, 0.3) !important;
+    border-left: 3px solid #dc3545 !important;
+    background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-生产环境"]:hover,
+.tab[data-contextual-identity-color="red"]:hover {
+    background: linear-gradient(90deg, rgba(220, 53, 69, 0.2) 0%, transparent 100%) !important;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-生产环境"].active,
+.tab[data-contextual-identity-color="red"].active {
+    background: linear-gradient(90deg, rgba(220, 53, 69, 0.3) 0%, transparent 100%) !important;
+    border-left: 4px solid #dc3545 !important;
+    font-weight: bold !important;
+}
+
+/* AWS开发环境容器 - 绿色 */
+.tab[data-contextual-identity-name*="AWS-开发环境"],
+.tab[data-contextual-identity-color="green"] {
+    --tab-surface: rgba(40, 167, 69, 0.1) !important;
+    --tab-surface-hover: rgba(40, 167, 69, 0.2) !important;
+    --tab-surface-active: rgba(40, 167, 69, 0.3) !important;
+    border-left: 3px solid #28a745 !important;
+    background: linear-gradient(90deg, rgba(40, 167, 69, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-开发环境"]:hover,
+.tab[data-contextual-identity-color="green"]:hover {
+    background: linear-gradient(90deg, rgba(40, 167, 69, 0.2) 0%, transparent 100%) !important;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-开发环境"].active,
+.tab[data-contextual-identity-color="green"].active {
+    background: linear-gradient(90deg, rgba(40, 167, 69, 0.3) 0%, transparent 100%) !important;
+    border-left: 4px solid #28a745 !important;
+    font-weight: bold !important;
+}
+
+/* AWS测试环境容器 - 蓝色 */
+.tab[data-contextual-identity-name*="AWS-测试环境"],
+.tab[data-contextual-identity-color="blue"] {
+    --tab-surface: rgba(0, 123, 255, 0.1) !important;
+    --tab-surface-hover: rgba(0, 123, 255, 0.2) !important;
+    --tab-surface-active: rgba(0, 123, 255, 0.3) !important;
+    border-left: 3px solid #007bff !important;
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-测试环境"]:hover,
+.tab[data-contextual-identity-color="blue"]:hover {
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.2) 0%, transparent 100%) !important;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-测试环境"].active,
+.tab[data-contextual-identity-color="blue"].active {
+    background: linear-gradient(90deg, rgba(0, 123, 255, 0.3) 0%, transparent 100%) !important;
+    border-left: 4px solid #007bff !important;
+    font-weight: bold !important;
+}
+
+/* AWS沙盒环境容器 - 黄色 */
+.tab[data-contextual-identity-name*="AWS-沙盒环境"],
+.tab[data-contextual-identity-color="yellow"] {
+    --tab-surface: rgba(255, 193, 7, 0.1) !important;
+    --tab-surface-hover: rgba(255, 193, 7, 0.2) !important;
+    --tab-surface-active: rgba(255, 193, 7, 0.3) !important;
+    border-left: 3px solid #ffc107 !important;
+    background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-沙盒环境"]:hover,
+.tab[data-contextual-identity-color="yellow"]:hover {
+    background: linear-gradient(90deg, rgba(255, 193, 7, 0.2) 0%, transparent 100%) !important;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+.tab[data-contextual-identity-name*="AWS-沙盒环境"].active,
+.tab[data-contextual-identity-color="yellow"].active {
+    background: linear-gradient(90deg, rgba(255, 193, 7, 0.3) 0%, transparent 100%) !important;
+    border-left: 4px solid #ffc107 !important;
+    font-weight: bold !important;
+}
+
+/* 通用容器颜色支持 */
+.tab[data-contextual-identity-color="orange"] {
+    border-left: 3px solid #fd7e14 !important;
+    background: linear-gradient(90deg, rgba(253, 126, 20, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-color="purple"] {
+    border-left: 3px solid #6f42c1 !important;
+    background: linear-gradient(90deg, rgba(111, 66, 193, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-color="pink"] {
+    border-left: 3px solid #e83e8c !important;
+    background: linear-gradient(90deg, rgba(232, 62, 140, 0.1) 0%, transparent 100%) !important;
+}
+
+.tab[data-contextual-identity-color="turquoise"] {
+    border-left: 3px solid #20c997 !important;
+    background: linear-gradient(90deg, rgba(32, 201, 151, 0.1) 0%, transparent 100%) !important;
+}
+
+/* 容器标签页的特殊标识 */
+.tab[data-contextual-identity-name*="AWS-"] .label::before {
+    content: "🔒 ";
+    opacity: 0.7;
+}
+
+.tab[data-contextual-identity-name*="生产"] .label::before {
+    content: "🔴 ";
+}
+
+.tab[data-contextual-identity-name*="开发"] .label::before {
+    content: "🟢 ";
+}
+
+.tab[data-contextual-identity-name*="测试"] .label::before {
+    content: "🔵 ";
+}
+
+.tab[data-contextual-identity-name*="沙盒"] .label::before {
+    content: "🟡 ";
+}
+
+/* 增强容器标签页的视觉效果 */
+.tab[data-contextual-identity-name*="AWS-"] {
+    position: relative;
+}
+
+.tab[data-contextual-identity-name*="AWS-"]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--tab-surface-active, rgba(0, 123, 255, 0.3));
+    opacity: 0.5;
+}
+
+/* 生产环境的特殊警告样式 */
+.tab[data-contextual-identity-name*="生产"] {
+    animation: production-pulse 3s infinite;
+}
+
+@keyframes production-pulse {
+    0%, 100% { 
+        border-left-color: #dc3545; 
+    }
+    50% { 
+        border-left-color: #ff6b6b; 
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+    }
+}
+
+/* 暗色主题适配 */
+@media (prefers-color-scheme: dark) {
+    .tab[data-contextual-identity-color="red"] {
+        background: linear-gradient(90deg, rgba(220, 53, 69, 0.15) 0%, transparent 100%) !important;
+    }
+    
+    .tab[data-contextual-identity-color="green"] {
+        background: linear-gradient(90deg, rgba(40, 167, 69, 0.15) 0%, transparent 100%) !important;
+    }
+    
+    .tab[data-contextual-identity-color="blue"] {
+        background: linear-gradient(90deg, rgba(0, 123, 255, 0.15) 0%, transparent 100%) !important;
+    }
+    
+    .tab[data-contextual-identity-color="yellow"] {
+        background: linear-gradient(90deg, rgba(255, 193, 7, 0.15) 0%, transparent 100%) !important;
+    }
+}
