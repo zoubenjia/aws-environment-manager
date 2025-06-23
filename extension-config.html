@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 扩展配置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .environment-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        
+        .environment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 5px;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        
+        .btn:hover { opacity: 0.9; }
+        
+        .debug-panel {
+            background: #f1f3f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser 配置</h1>
+        <p>扩展专用配置页面</p>
+    </div>
+
+    <!-- 基础配置 -->
+    <div class="section">
+        <h2>🔧 基础设置</h2>
+        
+        <div class="form-group">
+            <label class="form-label">AWS SSO起始URL</label>
+            <input type="text" id="ssoStartUrl" class="form-input" 
+                   value="https://d-9067f2e3cc.awsapps.com/start/#/console">
+        </div>
+    </div>
+
+    <!-- 环境配置 -->
+    <div class="section">
+        <h2>🌍 环境配置</h2>
+        
+        <div id="environmentList">
+            <!-- 环境列表 -->
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button type="button" class="btn btn-primary" id="addEnvironmentButton">
+                ➕ 添加新环境
+            </button>
+        </div>
+    </div>
+
+    <!-- 调试信息 -->
+    <div class="section">
+        <h3>🔍 调试信息</h3>
+        <div id="debugPanel" class="debug-panel">
+            扩展环境初始化中...
+        </div>
+    </div>
+
+    <!-- 保存配置 -->
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-success" id="saveButton">
+            💾 保存配置
+        </button>
+        <button class="btn btn-secondary" id="resetButton">
+            🔄 重置配置
+        </button>
+    </div>
+
+    <div id="statusMessage"></div>
+
+    <script>
+        // 扩展环境检测和调试
+        function debug(message) {
+            const debugPanel = document.getElementById('debugPanel');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            debugPanel.textContent += logEntry;
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        // 检查扩展环境
+        function checkExtensionEnvironment() {
+            debug('检查扩展环境...');
+            
+            if (typeof browser !== 'undefined') {
+                debug('✅ browser API 可用');
+            } else if (typeof chrome !== 'undefined') {
+                debug('✅ chrome API 可用，设置browser别名');
+                window.browser = chrome;
+            } else {
+                debug('❌ 扩展API不可用，使用localStorage');
+            }
+            
+            debug('扩展环境检查完成');
+        }
+
+        // 环境数据
+        let environments = [
+            {
+                id: 1,
+                name: '生产环境',
+                icon: '🔴',
+                color: '#dc3545',
+                accounts: [
+                    {
+                        name: '生产账号1',
+                        id: '487783143761',
+                        role: 'PowerUserAccess_prod',
+                        regions: ['eu-west-2', 'us-east-1']
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: '开发环境',
+                icon: '🟢',
+                color: '#28a745',
+                accounts: [
+                    {
+                        name: '开发账号1',
+                        id: '487783143761',
+                        role: 'PowerUserAccess_dev',
+                        regions: ['eu-central-1', 'us-west-2']
+                    }
+                ]
+            },
+            {
+                id: 3,
+                name: '测试环境',
+                icon: '🔵',
+                color: '#007bff',
+                accounts: [
+                    {
+                        name: '测试账号1',
+                        id: '487783143761',
+                        role: 'PowerUserAccess_staging',
+                        regions: ['ap-southeast-1', 'ap-northeast-1']
+                    }
+                ]
+            }
+        ];
+
+        let nextId = 4;
+
+        // 渲染环境列表
+        function renderEnvironments() {
+            debug('渲染环境列表...');
+            
+            const container = document.getElementById('environmentList');
+            container.innerHTML = '';
+            
+            environments.forEach(env => {
+                const envCard = document.createElement('div');
+                envCard.className = 'environment-card';
+                envCard.style.borderColor = env.color;
+                
+                envCard.innerHTML = `
+                    <div class="environment-header">
+                        <span>${env.icon} ${env.name}</span>
+                        <button type="button" class="btn btn-danger" data-env-id="${env.id}">
+                            🗑️ 删除
+                        </button>
+                    </div>
+                    
+                    <div class="grid">
+                        <div class="form-group">
+                            <label class="form-label">环境名称</label>
+                            <input type="text" class="form-input" value="${env.name}" 
+                                   data-env-id="${env.id}" data-field="name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">图标</label>
+                            <input type="text" class="form-input" value="${env.icon}" 
+                                   data-env-id="${env.id}" data-field="icon">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">账号信息</label>
+                        ${env.accounts.map(acc => `
+                            <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border: 1px solid #ddd;">
+                                <strong>${acc.name}</strong> (${acc.id})<br>
+                                <small>角色: ${acc.role} | 区域: ${acc.regions.join(', ')}</small>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(envCard);
+            });
+            
+            // 重新绑定删除按钮事件
+            bindDeleteButtons();
+            // 重新绑定输入框事件
+            bindInputEvents();
+            
+            debug(`环境列表渲染完成，共 ${environments.length} 个环境`);
+        }
+
+        // 绑定删除按钮事件
+        function bindDeleteButtons() {
+            const deleteButtons = document.querySelectorAll('[data-env-id]');
+            deleteButtons.forEach(button => {
+                if (button.tagName === 'BUTTON') {
+                    button.addEventListener('click', function() {
+                        const envId = parseInt(this.getAttribute('data-env-id'));
+                        removeEnvironment(envId);
+                    });
+                }
+            });
+        }
+
+        // 绑定输入框事件
+        function bindInputEvents() {
+            const inputs = document.querySelectorAll('input[data-env-id]');
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const envId = parseInt(this.getAttribute('data-env-id'));
+                    const field = this.getAttribute('data-field');
+                    const value = this.value;
+                    updateEnvironment(envId, field, value);
+                });
+            });
+        }
+
+        // 添加新环境
+        function addNewEnvironment() {
+            debug('添加新环境函数被调用');
+            
+            try {
+                const newEnv = {
+                    id: nextId++,
+                    name: `新环境${nextId-1}`,
+                    icon: '⚪',
+                    color: '#6c757d',
+                    accounts: [
+                        {
+                            name: '新账号',
+                            id: '123456789012',
+                            role: 'PowerUserAccess',
+                            regions: ['us-east-1']
+                        }
+                    ]
+                };
+                
+                environments.push(newEnv);
+                debug(`新环境已添加: ${newEnv.name} (ID: ${newEnv.id})`);
+                
+                renderEnvironments();
+                showStatus(`✅ 成功添加新环境: ${newEnv.name}`, 'success');
+                
+            } catch (error) {
+                debug(`添加环境时出错: ${error.message}`);
+                showStatus(`❌ 添加环境失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 删除环境
+        function removeEnvironment(envId) {
+            debug(`删除环境 ID: ${envId}`);
+            
+            if (confirm('确定要删除这个环境吗？')) {
+                const index = environments.findIndex(env => env.id === envId);
+                if (index !== -1) {
+                    const removedEnv = environments.splice(index, 1)[0];
+                    debug(`环境已删除: ${removedEnv.name}`);
+                    renderEnvironments();
+                    showStatus(`✅ 环境 "${removedEnv.name}" 已删除`, 'success');
+                }
+            }
+        }
+
+        // 更新环境
+        function updateEnvironment(envId, field, value) {
+            const env = environments.find(e => e.id === envId);
+            if (env) {
+                env[field] = value;
+                debug(`环境${field}已更新: ID ${envId} -> ${value}`);
+            }
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status status-${type}`;
+            statusDiv.textContent = message;
+            
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 3000);
+        }
+
+        // 保存配置
+        async function saveConfiguration() {
+            debug('保存配置到扩展存储...');
+            
+            const config = {
+                ssoStartUrl: document.getElementById('ssoStartUrl').value,
+                environmentRules: environments.map(env => ({
+                    name: env.name,
+                    type: env.name.includes('生产') ? 'production' : 
+                          env.name.includes('开发') ? 'development' : 'staging',
+                    icon: env.icon,
+                    color: env.color,
+                    accounts: env.accounts.map(acc => ({
+                        accountId: acc.id,
+                        accountName: acc.name,
+                        roleName: acc.role,
+                        regions: acc.regions
+                    }))
+                }))
+            };
+            
+            try {
+                if (typeof browser !== 'undefined' && browser.storage) {
+                    await browser.storage.local.set(config);
+                    debug('配置已保存到扩展存储');
+                    showStatus('✅ 配置已保存！请重新载入扩展。', 'success');
+                } else {
+                    localStorage.setItem('awsExtensionConfig', JSON.stringify(config));
+                    debug('配置已保存到本地存储');
+                    showStatus('✅ 配置已保存到本地存储', 'success');
+                }
+            } catch (error) {
+                debug(`保存失败: ${error.message}`);
+                showStatus(`❌ 保存失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 重置配置
+        function resetConfiguration() {
+            if (confirm('确定要重置配置吗？')) {
+                location.reload();
+            }
+        }
+
+        // 初始化页面
+        function initializePage() {
+            debug('页面初始化开始...');
+            
+            // 检查扩展环境
+            checkExtensionEnvironment();
+            
+            // 绑定主要按钮事件
+            const addButton = document.getElementById('addEnvironmentButton');
+            if (addButton) {
+                addButton.addEventListener('click', addNewEnvironment);
+                debug('添加环境按钮事件已绑定');
+            }
+            
+            const saveButton = document.getElementById('saveButton');
+            if (saveButton) {
+                saveButton.addEventListener('click', saveConfiguration);
+                debug('保存按钮事件已绑定');
+            }
+            
+            const resetButton = document.getElementById('resetButton');
+            if (resetButton) {
+                resetButton.addEventListener('click', resetConfiguration);
+                debug('重置按钮事件已绑定');
+            }
+            
+            // 渲染环境列表
+            renderEnvironments();
+            
+            debug('页面初始化完成');
+        }
+
+        // 确保页面完全加载后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+    </script>
+</body>
+</html>
