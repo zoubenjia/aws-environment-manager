@@ -1,0 +1,55 @@
+/* AWS Environment Browser Extension - 直接CSS颜色强制 */
+
+/* 强制整个页面背景为红色 - 生产环境 */
+html {
+    background: #dc3545 !important;
+    background-color: #dc3545 !important;
+    min-height: 100vh !important;
+}
+
+body {
+    background: #dc3545 !important;
+    background-color: #dc3545 !important;
+    min-height: 100vh !important;
+}
+
+/* 强制所有元素背景 */
+* {
+    background-color: rgba(220, 53, 69, 0.3) !important;
+}
+
+/* 主要容器 */
+#app, #root, .app, .root, [role="main"], .awsui-app-layout {
+    background: #dc3545 !important;
+    background-color: #dc3545 !important;
+}
+
+/* 导航栏 */
+#awsc-nav-header, .awsc-nav-header, header[role="banner"] {
+    background: #dc3545 !important;
+    background-color: #dc3545 !important;
+}
+
+/* 内容区域 */
+.awsui-app-layout__content, .console-content, .main-content {
+    background: rgba(220, 53, 69, 0.8) !important;
+    background-color: rgba(220, 53, 69, 0.8) !important;
+}
+
+/* 卡片和面板 */
+.awsui-container, .awsui-cards, .panel, .card {
+    background: rgba(220, 53, 69, 0.6) !important;
+    background-color: rgba(220, 53, 69, 0.6) !important;
+}
+
+/* 表格 */
+.awsui-table, table {
+    background: rgba(220, 53, 69, 0.4) !important;
+    background-color: rgba(220, 53, 69, 0.4) !important;
+}
+
+/* 标签页 */
+.awsui-tabs__tab, .tab, [role="tab"] {
+    background: rgba(220, 53, 69, 0.7) !important;
+    background-color: rgba(220, 53, 69, 0.7) !important;
+}
