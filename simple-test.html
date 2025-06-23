@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Test</title>
+    <style>
+        body {
+            width: 300px;
+            height: 400px;
+            padding: 20px;
+            background: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h3>🧪 最简单测试</h3>
+    
+    <button onclick="alert('按钮1工作正常！')">
+        测试按钮1
+    </button>
+    
+    <button onclick="console.log('按钮2被点击'); alert('按钮2工作正常！')">
+        测试按钮2
+    </button>
+    
+    <button onclick="
+        try {
+            alert('JavaScript执行正常！\\n时间: ' + new Date());
+        } catch(e) {
+            alert('错误: ' + e.message);
+        }
+    ">
+        JavaScript测试
+    </button>
+    
+    <button onclick="
+        if (typeof chrome !== 'undefined') {
+            alert('Chrome扩展API可用');
+        } else if (typeof browser !== 'undefined') {
+            alert('Browser扩展API可用');
+        } else {
+            alert('没有扩展API');
+        }
+    ">
+        API测试
+    </button>
+    
+    <script>
+        console.log('脚本加载成功');
+        console.log('当前时间:', new Date());
+        console.log('Chrome API:', typeof chrome);
+        console.log('Browser API:', typeof browser);
+    </script>
+</body>
+</html>
