@@ -1,0 +1,13 @@
+/* 最简单的红色背景 - 强制整个页面 */
+
+html, body, * {
+    background: red !important;
+}
+
+html {
+    background-color: red !important;
+}
+
+body {
+    background-color: red !important;
+}
