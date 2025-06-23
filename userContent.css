@@ -1,0 +1,119 @@
+/* AWS控制台区域颜色标识 - 基于之前成功的配置 */
+@-moz-document domain("console.aws.amazon.com") {
+  
+  /* 强制整个页面背景颜色 */
+  html, body {
+    background: #dc3545 !important;
+    background-color: #dc3545 !important;
+    min-height: 100vh !important;
+  }
+  
+  /* 通用AWS控制台导航栏选择器 */
+  #awsc-nav-header, 
+  .awsc-nav-header, 
+  header[role="banner"],
+  .globalNav-0131,
+  nav[class*="globalNav"],
+  [data-testid="awsc-nav-header"] {
+    background-color: #ffcccc !important; /* 粉红色 */
+    border-bottom: 3px solid #ff9999 !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  /* 伦敦区域 - eu-west-2 */
+  body[class*="eu-west-2"] #awsc-nav-header,
+  body[class*="eu-west-2"] .awsc-nav-header,
+  body[class*="eu-west-2"] header[role="banner"],
+  body[class*="eu-west-2"] .globalNav-0131,
+  body[class*="eu-west-2"] nav[class*="globalNav"],
+  body[class*="eu-west-2"] [data-testid="awsc-nav-header"] {
+    background-color: #ffcccc !important; /* 粉红色 */
+    border-bottom: 3px solid #ff9999 !important;
+  }
+  
+  /* 法兰克福区域 - eu-central-1 */
+  body[class*="eu-central-1"] #awsc-nav-header,
+  body[class*="eu-central-1"] .awsc-nav-header,
+  body[class*="eu-central-1"] header[role="banner"],
+  body[class*="eu-central-1"] .globalNav-0131,
+  body[class*="eu-central-1"] nav[class*="globalNav"],
+  body[class*="eu-central-1"] [data-testid="awsc-nav-header"] {
+    background-color: #ccffcc !important; /* 淡绿色 */
+    border-bottom: 3px solid #99ff99 !important;
+  }
+  
+  /* 北弗吉尼亚区域 - us-east-1 */
+  body[class*="us-east-1"] #awsc-nav-header,
+  body[class*="us-east-1"] .awsc-nav-header,
+  body[class*="us-east-1"] header[role="banner"],
+  body[class*="us-east-1"] .globalNav-0131,
+  body[class*="us-east-1"] nav[class*="globalNav"],
+  body[class*="us-east-1"] [data-testid="awsc-nav-header"] {
+    background-color: #cce5ff !important; /* 淡蓝色 */
+    border-bottom: 3px solid #99ccff !important;
+  }
+  
+  /* 俄勒冈区域 - us-west-2 */
+  body[class*="us-west-2"] #awsc-nav-header,
+  body[class*="us-west-2"] .awsc-nav-header,
+  body[class*="us-west-2"] header[role="banner"],
+  body[class*="us-west-2"] .globalNav-0131,
+  body[class*="us-west-2"] nav[class*="globalNav"],
+  body[class*="us-west-2"] [data-testid="awsc-nav-header"] {
+    background-color: #ccffff !important; /* 淡青色 */
+    border-bottom: 3px solid #99ffff !important;
+  }
+  
+  /* 亚太地区 - ap-southeast-1 (新加坡) */
+  body[class*="ap-southeast-1"] #awsc-nav-header,
+  body[class*="ap-southeast-1"] .awsc-nav-header,
+  body[class*="ap-southeast-1"] header[role="banner"],
+  body[class*="ap-southeast-1"] .globalNav-0131,
+  body[class*="ap-southeast-1"] nav[class*="globalNav"],
+  body[class*="ap-southeast-1"] [data-testid="awsc-nav-header"] {
+    background-color: #ffd4cc !important; /* 淡橙色 */
+    border-bottom: 3px solid #ffb399 !important;
+  }
+  
+  /* 亚太地区 - ap-northeast-1 (东京) */
+  body[class*="ap-northeast-1"] #awsc-nav-header,
+  body[class*="ap-northeast-1"] .awsc-nav-header,
+  body[class*="ap-northeast-1"] header[role="banner"],
+  body[class*="ap-northeast-1"] .globalNav-0131,
+  body[class*="ap-northeast-1"] nav[class*="globalNav"],
+  body[class*="ap-northeast-1"] [data-testid="awsc-nav-header"] {
+    background-color: #e6ccff !important; /* 淡紫色 */
+    border-bottom: 3px solid #d199ff !important;
+  }
+  
+  /* URL参数检测备用方案 */
+  body:has([href*="region=eu-west-2"]) #awsc-nav-header,
+  body:has([href*="region=eu-west-2"]) .awsc-nav-header,
+  body:has([href*="region=eu-west-2"]) header[role="banner"],
+  body:has([href*="region=eu-west-2"]) .globalNav-0131,
+  body:has([href*="region=eu-west-2"]) nav[class*="globalNav"],
+  body:has([href*="region=eu-west-2"]) [data-testid="awsc-nav-header"] {
+    background-color: #ffcccc !important;
+    border-bottom: 3px solid #ff9999 !important;
+  }
+  
+  /* 强制所有元素背景 */
+  * {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+  }
+  
+  /* 主要内容区域 */
+  #app, #root, .app, .root, [role="main"], .awsui-app-layout {
+    background: rgba(220, 53, 69, 0.3) !important;
+  }
+  
+  /* 内容区域 */
+  .awsui-app-layout__content, .console-content, .main-content {
+    background: rgba(220, 53, 69, 0.2) !important;
+  }
+  
+  /* 卡片和面板 */
+  .awsui-container, .awsui-cards, .panel, .card {
+    background: rgba(220, 53, 69, 0.15) !important;
+  }
+}
