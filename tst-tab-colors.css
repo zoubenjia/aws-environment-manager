@@ -1,0 +1,150 @@
+/* Tree Style Tab (TST) 标签页颜色配置 */
+/* 基于AWS环境的标签页背景颜色 */
+
+/* 生产环境 - 红色标签页 */
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="prod"],
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="production"],
+.tab[data-current-uri*="console.aws.amazon.com"]:not([data-current-uri*="dev"]):not([data-current-uri*="test"]):not([data-current-uri*="staging"]) {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    color: white !important;
+    border-left: 4px solid #dc3545 !important;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="prod"]:hover,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="production"]:hover,
+.tab[data-current-uri*="console.aws.amazon.com"]:not([data-current-uri*="dev"]):not([data-current-uri*="test"]):not([data-current-uri*="staging"]):hover {
+    background: linear-gradient(135deg, #e74c3c, #dc3545) !important;
+}
+
+/* 开发环境 - 绿色标签页 */
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="dev"],
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="development"] {
+    background: linear-gradient(135deg, #28a745, #218838) !important;
+    color: white !important;
+    border-left: 4px solid #28a745 !important;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="dev"]:hover,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="development"]:hover {
+    background: linear-gradient(135deg, #2ecc71, #28a745) !important;
+}
+
+/* 测试环境 - 蓝色标签页 */
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="test"],
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="staging"] {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    color: white !important;
+    border-left: 4px solid #007bff !important;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="test"]:hover,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="staging"]:hover {
+    background: linear-gradient(135deg, #3498db, #007bff) !important;
+}
+
+/* 活动标签页增强效果 */
+.tab.active[data-current-uri*="console.aws.amazon.com"] {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    transform: translateX(2px) !important;
+}
+
+/* 标签页标题前添加环境图标 */
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="prod"] .label::before,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="production"] .label::before,
+.tab[data-current-uri*="console.aws.amazon.com"]:not([data-current-uri*="dev"]):not([data-current-uri*="test"]):not([data-current-uri*="staging"]) .label::before {
+    content: "🔴 ";
+    font-size: 12px;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="dev"] .label::before,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="development"] .label::before {
+    content: "🟢 ";
+    font-size: 12px;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="test"] .label::before,
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="staging"] .label::before {
+    content: "🔵 ";
+    font-size: 12px;
+}
+
+/* 区域特定的颜色变化 */
+/* 伦敦区域 - eu-west-2 */
+.tab[data-current-uri*="eu-west-2.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #ffcccc, #ff9999) !important;
+    color: #333 !important;
+    border-left: 4px solid #ff6666 !important;
+}
+
+/* 法兰克福区域 - eu-central-1 */
+.tab[data-current-uri*="eu-central-1.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #ccffcc, #99ff99) !important;
+    color: #333 !important;
+    border-left: 4px solid #66ff66 !important;
+}
+
+/* 北弗吉尼亚区域 - us-east-1 */
+.tab[data-current-uri*="us-east-1.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #cce5ff, #99ccff) !important;
+    color: #333 !important;
+    border-left: 4px solid #66b3ff !important;
+}
+
+/* 俄勒冈区域 - us-west-2 */
+.tab[data-current-uri*="us-west-2.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #ccffff, #99ffff) !important;
+    color: #333 !important;
+    border-left: 4px solid #66ffff !important;
+}
+
+/* 新加坡区域 - ap-southeast-1 */
+.tab[data-current-uri*="ap-southeast-1.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #ffd4cc, #ffb399) !important;
+    color: #333 !important;
+    border-left: 4px solid #ff9966 !important;
+}
+
+/* 东京区域 - ap-northeast-1 */
+.tab[data-current-uri*="ap-northeast-1.console.aws.amazon.com"] {
+    background: linear-gradient(135deg, #e6ccff, #d199ff) !important;
+    color: #333 !important;
+    border-left: 4px solid #cc66ff !important;
+}
+
+/* 标签页文字增强 */
+.tab[data-current-uri*="console.aws.amazon.com"] .label {
+    font-weight: bold !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+/* 关闭按钮样式 */
+.tab[data-current-uri*="console.aws.amazon.com"] .closebox {
+    background: rgba(255,255,255,0.3) !important;
+    border-radius: 50% !important;
+}
+
+.tab[data-current-uri*="console.aws.amazon.com"] .closebox:hover {
+    background: rgba(255,255,255,0.6) !important;
+}
+
+/* 标签页组织 - AWS标签页分组 */
+.tab[data-current-uri*="console.aws.amazon.com"] {
+    margin-bottom: 2px !important;
+    border-radius: 4px !important;
+}
+
+/* 生产环境警告效果 */
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="prod"],
+.tab[data-current-uri*="console.aws.amazon.com"][data-current-uri*="production"],
+.tab[data-current-uri*="console.aws.amazon.com"]:not([data-current-uri*="dev"]):not([data-current-uri*="test"]):not([data-current-uri*="staging"]) {
+    animation: production-pulse 3s infinite !important;
+}
+
+@keyframes production-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.5) !important;
+    }
+    50% { 
+        box-shadow: 0 0 15px rgba(220, 53, 69, 0.8) !important;
+    }
+}
