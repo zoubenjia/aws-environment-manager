@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 静态配置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .environment-item {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        
+        .environment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 5px;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        
+        .btn:hover { opacity: 0.9; }
+        
+        .debug-info {
+            background: #f1f3f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .manual-config {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .config-code {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser 配置</h1>
+        <p>静态配置版本 - 解决JavaScript问题</p>
+    </div>
+
+    <!-- 问题诊断 -->
+    <div class="section">
+        <h2>🔍 问题诊断</h2>
+        <div class="status status-error">
+            ❌ JavaScript功能在扩展环境中被阻止
+        </div>
+        <p><strong>问题原因：</strong></p>
+        <ul>
+            <li>扩展的内容安全策略(CSP)阻止了内联JavaScript</li>
+            <li>onclick事件和动态脚本被安全限制</li>
+            <li>需要使用扩展专用的配置方式</li>
+        </ul>
+    </div>
+
+    <!-- 当前配置显示 -->
+    <div class="section">
+        <h2>📋 当前环境配置</h2>
+        
+        <div class="form-group">
+            <label class="form-label">AWS SSO起始URL</label>
+            <input type="text" class="form-input" 
+                   value="https://d-9067f2e3cc.awsapps.com/start/#/console" readonly>
+        </div>
+        
+        <h3>环境列表：</h3>
+        
+        <div class="environment-item" style="border-color: #dc3545;">
+            <div class="environment-header">
+                <span>🔴 生产环境</span>
+            </div>
+            <div>
+                <strong>账号ID:</strong> 487783143761<br>
+                <strong>角色:</strong> PowerUserAccess_prod<br>
+                <strong>区域:</strong> eu-west-2 (伦敦), us-east-1 (北弗吉尼亚)
+            </div>
+        </div>
+        
+        <div class="environment-item" style="border-color: #28a745;">
+            <div class="environment-header">
+                <span>🟢 开发环境</span>
+            </div>
+            <div>
+                <strong>账号ID:</strong> 487783143761<br>
+                <strong>角色:</strong> PowerUserAccess_dev<br>
+                <strong>区域:</strong> eu-central-1 (法兰克福), us-west-2 (俄勒冈)
+            </div>
+        </div>
+        
+        <div class="environment-item" style="border-color: #007bff;">
+            <div class="environment-header">
+                <span>🔵 测试环境</span>
+            </div>
+            <div>
+                <strong>账号ID:</strong> 487783143761<br>
+                <strong>角色:</strong> PowerUserAccess_staging<br>
+                <strong>区域:</strong> ap-southeast-1 (新加坡), ap-northeast-1 (东京)
+            </div>
+        </div>
+    </div>
+
+    <!-- 手动配置方法 -->
+    <div class="section">
+        <h2>🔧 手动添加环境配置</h2>
+        
+        <div class="manual-config">
+            <h3>方法1: 修改background脚本</h3>
+            <p>直接编辑 <code>background-multi-account.js</code> 文件中的环境配置：</p>
+            
+            <div class="config-code">// 在 background-multi-account.js 中找到 environmentRules 数组
+// 添加新环境配置：
+
+{
+  name: '新环境名称',
+  type: 'custom',
+  icon: '⚪',
+  color: '#6c757d',
+  accounts: [
+    {
+      accountId: '您的账号ID',
+      accountName: '账号名称',
+      roleName: '角色名称',
+      regions: ['区域1', '区域2']
+    }
+  ]
+}</div>
+        </div>
+        
+        <div class="manual-config">
+            <h3>方法2: 使用浏览器控制台</h3>
+            <p>在扩展的background页面控制台中执行：</p>
+            
+            <div class="config-code">// 按F12打开开发者工具，在控制台中执行：
+
+// 添加新环境
+currentConfig.environmentRules.push({
+  name: '新环境',
+  type: 'custom', 
+  icon: '⚪',
+  color: '#6c757d',
+  accounts: [{
+    accountId: '123456789012',
+    accountName: '新账号',
+    roleName: 'PowerUserAccess',
+    regions: ['us-east-1']
+  }]
+});
+
+// 保存配置
+browser.storage.local.set(currentConfig);</div>
+        </div>
+        
+        <div class="manual-config">
+            <h3>方法3: 创建独立的配置脚本</h3>
+            <p>创建一个单独的HTML文件来配置环境：</p>
+            
+            <div class="config-code">&lt;!-- 创建 config-tool.html --&gt;
+&lt;script&gt;
+// 配置数据
+const newConfig = {
+  ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+  environmentRules: [
+    // 在这里添加您的环境配置
+  ]
+};
+
+// 保存到localStorage
+localStorage.setItem('awsConfig', JSON.stringify(newConfig));
+&lt;/script&gt;</div>
+        </div>
+    </div>
+
+    <!-- 解决方案 -->
+    <div class="section">
+        <h2>💡 推荐解决方案</h2>
+        
+        <div class="status status-success">
+            ✅ 使用独立的配置工具页面
+        </div>
+        
+        <p><strong>我将为您创建一个独立的配置工具，不依赖扩展环境：</strong></p>
+        <ol>
+            <li>创建独立的HTML配置工具</li>
+            <li>在标准浏览器环境中运行</li>
+            <li>生成配置文件供扩展使用</li>
+            <li>避免扩展的安全限制</li>
+        </ol>
+    </div>
+
+    <!-- 当前URL生成示例 -->
+    <div class="section">
+        <h2>🔗 URL生成示例</h2>
+        
+        <h3>开发环境 - 法兰克福：</h3>
+        <div class="config-code">https://d-9067f2e3cc.awsapps.com/start/#/console?account_id=487783143761&role_name=PowerUserAccess_dev&destination=https%3A//eu-central-1.console.aws.amazon.com/console/home%3Fregion%3Deu-central-1</div>
+        
+        <h3>生产环境 - 伦敦：</h3>
+        <div class="config-code">https://d-9067f2e3cc.awsapps.com/start/#/console?account_id=487783143761&role_name=PowerUserAccess_prod&destination=https%3A//eu-west-2.console.aws.amazon.com/console/home%3Fregion%3Deu-west-2</div>
+    </div>
+
+    <div class="debug-info">
+        <strong>调试信息：</strong><br>
+        - 扩展环境检测：CSP限制导致JavaScript无法执行<br>
+        - 解决方案：使用独立配置工具或手动编辑配置文件<br>
+        - 状态：当前配置可正常使用，添加新环境需要手动方式
+    </div>
+</body>
+</html>
