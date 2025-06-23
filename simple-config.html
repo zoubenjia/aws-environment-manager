@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 简化配置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .url-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+        
+        .environment-config {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        
+        .environment-config h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser 配置</h1>
+        <p>自定义您的AWS环境和起始页设置</p>
+    </div>
+
+    <!-- 基础配置 -->
+    <div class="section">
+        <h2>🔧 基础设置</h2>
+        
+        <div class="form-group">
+            <label class="form-label">AWS SSO起始URL</label>
+            <input type="text" id="ssoStartUrl" class="form-input" 
+                   value="https://d-9067f2e3cc.awsapps.com/start/#/console">
+            <div class="form-description">您的AWS SSO登录起始页面URL</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">AWS账户ID</label>
+            <input type="text" id="defaultAccountId" class="form-input" 
+                   value="487783143761">
+            <div class="form-description">您的AWS账户ID（12位数字）</div>
+        </div>
+    </div>
+
+    <!-- 环境配置 -->
+    <div class="section">
+        <h2>🌍 环境配置</h2>
+        
+        <div class="environment-config">
+            <h4>🔴 生产环境</h4>
+            <div class="config-grid">
+                <div class="form-group">
+                    <label class="form-label">角色名称</label>
+                    <input type="text" id="prodRole" class="form-input" value="PowerUserAccess_prod">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">适用区域</label>
+                    <input type="text" id="prodRegions" class="form-input" value="eu-west-2, us-east-1">
+                </div>
+            </div>
+        </div>
+        
+        <div class="environment-config">
+            <h4>🟢 开发环境</h4>
+            <div class="config-grid">
+                <div class="form-group">
+                    <label class="form-label">角色名称</label>
+                    <input type="text" id="devRole" class="form-input" value="PowerUserAccess_dev">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">适用区域</label>
+                    <input type="text" id="devRegions" class="form-input" value="eu-central-1, us-west-2">
+                </div>
+            </div>
+        </div>
+        
+        <div class="environment-config">
+            <h4>🔵 测试环境</h4>
+            <div class="config-grid">
+                <div class="form-group">
+                    <label class="form-label">角色名称</label>
+                    <input type="text" id="stagingRole" class="form-input" value="PowerUserAccess_staging">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">适用区域</label>
+                    <input type="text" id="stagingRegions" class="form-input" value="ap-southeast-1, ap-northeast-1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- URL预览 -->
+    <div class="section">
+        <h2>🔍 URL预览和测试</h2>
+        
+        <div class="config-grid">
+            <div class="form-group">
+                <label class="form-label">测试环境</label>
+                <select id="testEnvironment" class="form-input">
+                    <option value="dev">🟢 开发环境</option>
+                    <option value="prod">🔴 生产环境</option>
+                    <option value="staging">🔵 测试环境</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">测试区域</label>
+                <select id="testRegion" class="form-input">
+                    <option value="eu-west-2">🇬🇧 伦敦 (eu-west-2)</option>
+                    <option value="eu-central-1">🇩🇪 法兰克福 (eu-central-1)</option>
+                    <option value="us-east-1">🇺🇸 北弗吉尼亚 (us-east-1)</option>
+                    <option value="us-west-2">🇺🇸 俄勒冈 (us-west-2)</option>
+                    <option value="ap-southeast-1">🇸🇬 新加坡 (ap-southeast-1)</option>
+                    <option value="ap-northeast-1">🇯🇵 东京 (ap-northeast-1)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button type="button" class="btn btn-secondary" onclick="generatePreview()">
+            🔍 生成URL预览
+        </button>
+        
+        <div id="urlPreview" class="url-preview" style="display: none;">
+            <!-- URL预览将在这里显示 -->
+        </div>
+        
+        <div style="margin-top: 10px;">
+            <button type="button" class="btn btn-primary" onclick="testUrl()" style="display: none;" id="testUrlBtn">
+                🧪 在新标签页中测试
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="copyUrl()" style="display: none;" id="copyUrlBtn">
+                📋 复制URL
+            </button>
+        </div>
+    </div>
+
+    <!-- 保存配置 -->
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-primary" onclick="saveConfiguration()">
+            💾 保存配置
+        </button>
+        <button class="btn btn-secondary" onclick="resetConfiguration()">
+            🔄 重置为默认
+        </button>
+    </div>
+
+    <div id="statusMessage" style="display: none;"></div>
+
+    <script>
+        let currentPreviewUrl = '';
+
+        // 生成URL预览
+        function generatePreview() {
+            const ssoUrl = document.getElementById('ssoStartUrl').value;
+            const accountId = document.getElementById('defaultAccountId').value;
+            const environment = document.getElementById('testEnvironment').value;
+            const region = document.getElementById('testRegion').value;
+            
+            // 获取对应环境的角色名称
+            let roleName = '';
+            if (environment === 'prod') {
+                roleName = document.getElementById('prodRole').value;
+            } else if (environment === 'dev') {
+                roleName = document.getElementById('devRole').value;
+            } else if (environment === 'staging') {
+                roleName = document.getElementById('stagingRole').value;
+            }
+            
+            // 构建目标URL
+            const destinationUrl = `https://${region}.console.aws.amazon.com/console/home?region=${region}`;
+            const encodedDestination = encodeURIComponent(destinationUrl);
+            
+            // 构建最终URL
+            const finalUrl = `${ssoUrl}?account_id=${accountId}&role_name=${roleName}&destination=${encodedDestination}`;
+            
+            // 显示预览
+            const previewDiv = document.getElementById('urlPreview');
+            previewDiv.style.display = 'block';
+            previewDiv.innerHTML = `
+                <strong>生成的AWS SSO URL:</strong><br>
+                <span style="color: #007ec6;">${finalUrl}</span>
+            `;
+            
+            currentPreviewUrl = finalUrl;
+            
+            // 显示测试按钮
+            document.getElementById('testUrlBtn').style.display = 'inline-block';
+            document.getElementById('copyUrlBtn').style.display = 'inline-block';
+        }
+
+        // 测试URL
+        function testUrl() {
+            if (currentPreviewUrl) {
+                window.open(currentPreviewUrl, '_blank');
+            }
+        }
+
+        // 复制URL
+        function copyUrl() {
+            if (currentPreviewUrl) {
+                navigator.clipboard.writeText(currentPreviewUrl).then(() => {
+                    showStatus('URL已复制到剪贴板', 'success');
+                }).catch(() => {
+                    // 降级方案
+                    const textArea = document.createElement('textarea');
+                    textArea.value = currentPreviewUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('URL已复制到剪贴板', 'success');
+                });
+            }
+        }
+
+        // 保存配置
+        async function saveConfiguration() {
+            const config = {
+                ssoStartUrl: document.getElementById('ssoStartUrl').value,
+                defaultAccountId: document.getElementById('defaultAccountId').value,
+                environmentRules: [
+                    {
+                        name: '生产环境',
+                        icon: '🔴',
+                        color: '#ff6b6b',
+                        conditions: {
+                            accountId: document.getElementById('defaultAccountId').value,
+                            rolePattern: document.getElementById('prodRole').value,
+                            regions: document.getElementById('prodRegions').value.split(',').map(r => r.trim())
+                        }
+                    },
+                    {
+                        name: '开发环境',
+                        icon: '🟢',
+                        color: '#4ecdc4',
+                        conditions: {
+                            accountId: document.getElementById('defaultAccountId').value,
+                            rolePattern: document.getElementById('devRole').value,
+                            regions: document.getElementById('devRegions').value.split(',').map(r => r.trim())
+                        }
+                    },
+                    {
+                        name: '测试环境',
+                        icon: '🔵',
+                        color: '#45b7d1',
+                        conditions: {
+                            accountId: document.getElementById('defaultAccountId').value,
+                            rolePattern: document.getElementById('stagingRole').value,
+                            regions: document.getElementById('stagingRegions').value.split(',').map(r => r.trim())
+                        }
+                    }
+                ]
+            };
+            
+            try {
+                if (typeof browser !== 'undefined' && browser.storage) {
+                    await browser.storage.local.set(config);
+                    showStatus('配置已保存！请重新载入扩展以应用新配置。', 'success');
+                } else {
+                    // 降级到localStorage
+                    localStorage.setItem('awsEnvironmentConfig', JSON.stringify(config));
+                    showStatus('配置已保存到本地存储！', 'success');
+                }
+            } catch (error) {
+                console.error('保存配置失败:', error);
+                showStatus('保存失败: ' + error.message, 'error');
+            }
+        }
+
+        // 重置配置
+        function resetConfiguration() {
+            if (confirm('确定要重置为默认配置吗？')) {
+                document.getElementById('ssoStartUrl').value = 'https://d-9067f2e3cc.awsapps.com/start/#/console';
+                document.getElementById('defaultAccountId').value = '487783143761';
+                document.getElementById('prodRole').value = 'PowerUserAccess_prod';
+                document.getElementById('devRole').value = 'PowerUserAccess_dev';
+                document.getElementById('stagingRole').value = 'PowerUserAccess_staging';
+                document.getElementById('prodRegions').value = 'eu-west-2, us-east-1';
+                document.getElementById('devRegions').value = 'eu-central-1, us-west-2';
+                document.getElementById('stagingRegions').value = 'ap-southeast-1, ap-northeast-1';
+                
+                showStatus('配置已重置为默认值', 'success');
+            }
+        }
+
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status status-${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 加载保存的配置
+        async function loadConfiguration() {
+            try {
+                let config = null;
+                
+                if (typeof browser !== 'undefined' && browser.storage) {
+                    const stored = await browser.storage.local.get([
+                        'ssoStartUrl',
+                        'defaultAccountId',
+                        'environmentRules'
+                    ]);
+                    config = stored;
+                } else {
+                    // 降级到localStorage
+                    const stored = localStorage.getItem('awsEnvironmentConfig');
+                    if (stored) {
+                        config = JSON.parse(stored);
+                    }
+                }
+                
+                if (config) {
+                    if (config.ssoStartUrl) {
+                        document.getElementById('ssoStartUrl').value = config.ssoStartUrl;
+                    }
+                    if (config.defaultAccountId) {
+                        document.getElementById('defaultAccountId').value = config.defaultAccountId;
+                    }
+                    if (config.environmentRules) {
+                        const rules = config.environmentRules;
+                        rules.forEach(rule => {
+                            if (rule.name === '生产环境') {
+                                document.getElementById('prodRole').value = rule.conditions.rolePattern;
+                                document.getElementById('prodRegions').value = rule.conditions.regions.join(', ');
+                            } else if (rule.name === '开发环境') {
+                                document.getElementById('devRole').value = rule.conditions.rolePattern;
+                                document.getElementById('devRegions').value = rule.conditions.regions.join(', ');
+                            } else if (rule.name === '测试环境') {
+                                document.getElementById('stagingRole').value = rule.conditions.rolePattern;
+                                document.getElementById('stagingRegions').value = rule.conditions.regions.join(', ');
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('加载配置失败:', error);
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfiguration();
+        });
+    </script>
+</body>
+</html>
