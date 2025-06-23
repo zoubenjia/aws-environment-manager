@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Working Extension</title>
+</head>
+<body style="width: 350px; height: 400px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: system-ui;">
+    <h3>🚀 AWS Environment Manager</h3>
+    
+    <div id="status" style="background: rgba(255,255,255,0.2); padding: 8px; border-radius: 4px; margin: 10px 0; font-size: 12px;">
+        状态：初始化中...
+    </div>
+    
+    <button style="width: 100%; padding: 10px; margin: 8px 0; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;" 
+            onmousedown="addEnvironmentDirect()">
+        ➕ 添加环境
+    </button>
+    
+    <button style="width: 100%; padding: 10px; margin: 8px 0; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;" 
+            onmousedown="viewEnvironments()">
+        👁️ 查看环境
+    </button>
+    
+    <button style="width: 100%; padding: 10px; margin: 8px 0; background: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer;" 
+            onmousedown="resetEnvironments()">
+        🔄 重置默认
+    </button>
+    
+    <div id="envList" style="margin-top: 15px; max-height: 150px; overflow-y: auto;">
+        <!-- 环境列表 -->
+    </div>
+    
+    <script>
+        console.log('Working extension script loading...');
+        
+        // 使用onmousedown而不是onclick，更可靠
+        function updateStatus(msg) {
+            const el = document.getElementById('status');
+            if (el) {
+                el.textContent = '状态：' + msg;
+                console.log('Status:', msg);
+            }
+        }
+        
+        // 添加环境 - 直接方法
+        function addEnvironmentDirect() {
+            console.log('Add environment called');
+            updateStatus('添加环境中...');
+            
+            try {
+                const name = prompt('环境名称:', '新环境');
+                if (!name) {
+                    updateStatus('用户取消');
+                    return;
+                }
+                
+                const env = {
+                    id: 'env_' + Date.now(),
+                    name: name,
+                    icon: '🆕',
+                    color: '#28a745',
+                    description: '新添加的环境',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    regions: ['us-east-1']
+                };
+                
+                console.log('Created env:', env);
+                
+                // 直接使用browser.storage
+                browser.storage.local.get(['aws_environments']).then(result => {
+                    const envs = result.aws_environments || [];
+                    envs.push(env);
+                    return browser.storage.local.set({'aws_environments': envs});
+                }).then(() => {
+                    updateStatus('添加成功');
+                    alert('✅ 环境添加成功！\n名称：' + env.name);
+                    loadEnvironmentList();
+                }).catch(error => {
+                    console.error('Save error:', error);
+                    updateStatus('保存失败');
+                    alert('❌ 保存失败：' + error.message);
+                });
+                
+            } catch (error) {
+                console.error('Add error:', error);
+                updateStatus('添加失败');
+                alert('❌ 添加失败：' + error.message);
+            }
+        }
+        
+        // 查看环境
+        function viewEnvironments() {
+            console.log('View environments called');
+            updateStatus('查看环境中...');
+            
+            try {
+                browser.storage.local.get(['aws_environments']).then(result => {
+                    const envs = result.aws_environments || [];
+                    let msg = '环境列表：\n\n';
+                    
+                    if (envs.length === 0) {
+                        msg += '暂无环境';
+                    } else {
+                        envs.forEach((env, index) => {
+                            msg += (index + 1) + '. ' + env.name + '\n';
+                            msg += '   ID: ' + env.id + '\n\n';
+                        });
+                    }
+                    
+                    alert(msg);
+                    updateStatus('查看完成');
+                    loadEnvironmentList();
+                }).catch(error => {
+                    console.error('View error:', error);
+                    updateStatus('查看失败');
+                    alert('❌ 查看失败：' + error.message);
+                });
+            } catch (error) {
+                console.error('View error:', error);
+                updateStatus('查看失败');
+                alert('❌ 查看失败：' + error.message);
+            }
+        }
+        
+        // 重置环境
+        function resetEnvironments() {
+            console.log('Reset environments called');
+            
+            if (!confirm('确定要重置为默认环境吗？')) {
+                updateStatus('用户取消重置');
+                return;
+            }
+            
+            updateStatus('重置中...');
+            
+            const defaultEnvs = [
+                {
+                    id: 'production',
+                    name: '生产环境',
+                    icon: '🔴',
+                    color: '#dc3545',
+                    description: '生产环境 - 请谨慎操作',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    regions: ['eu-west-2', 'us-east-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'development',
+                    name: '开发环境',
+                    icon: '🟢',
+                    color: '#28a745',
+                    description: '开发环境 - 安全测试',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_dev',
+                    regions: ['eu-central-1', 'us-west-2'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'staging',
+                    name: '测试环境',
+                    icon: '🔵',
+                    color: '#007bff',
+                    description: '测试环境 - 预发布验证',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_staging',
+                    regions: ['ap-southeast-1', 'ap-northeast-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                }
+            ];
+            
+            try {
+                browser.storage.local.set({'aws_environments': defaultEnvs}).then(() => {
+                    updateStatus('重置完成');
+                    alert('✅ 已重置为默认环境！\n共 ' + defaultEnvs.length + ' 个环境');
+                    loadEnvironmentList();
+                }).catch(error => {
+                    console.error('Reset error:', error);
+                    updateStatus('重置失败');
+                    alert('❌ 重置失败：' + error.message);
+                });
+            } catch (error) {
+                console.error('Reset error:', error);
+                updateStatus('重置失败');
+                alert('❌ 重置失败：' + error.message);
+            }
+        }
+        
+        // 加载环境列表到界面
+        function loadEnvironmentList() {
+            console.log('Loading environment list');
+            
+            try {
+                browser.storage.local.get(['aws_environments']).then(result => {
+                    const envs = result.aws_environments || [];
+                    const container = document.getElementById('envList');
+                    
+                    if (!container) return;
+                    
+                    if (envs.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; opacity: 0.7; font-size: 12px;">暂无环境</div>';
+                        return;
+                    }
+                    
+                    container.innerHTML = '';
+                    envs.forEach(env => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'background: rgba(255,255,255,0.1); margin: 4px 0; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 12px; border-left: 3px solid ' + (env.color || '#28a745');
+                        div.innerHTML = env.icon + ' ' + env.name;
+                        
+                        div.onmousedown = function() {
+                            openAWSConsole(env);
+                        };
+                        
+                        container.appendChild(div);
+                    });
+                }).catch(error => {
+                    console.error('Load list error:', error);
+                });
+            } catch (error) {
+                console.error('Load list error:', error);
+            }
+        }
+        
+        // 打开AWS控制台
+        function openAWSConsole(env) {
+            console.log('Opening AWS console for:', env.name);
+            updateStatus('打开控制台: ' + env.name);
+            
+            if (env.id === 'production') {
+                if (!confirm('⚠️ 警告：您即将打开生产环境！\n\n确定要继续吗？')) {
+                    updateStatus('用户取消打开生产环境');
+                    return;
+                }
+            }
+            
+            let url = 'https://console.aws.amazon.com/';
+            
+            if (env.ssoStartUrl && env.accountId && env.roleName) {
+                const region = env.regions && env.regions.length > 0 ? env.regions[0] : 'us-east-1';
+                const destination = `https://${region}.console.aws.amazon.com/console/home?region=${region}`;
+                url = `${env.ssoStartUrl}?account_id=${env.accountId}&role_name=${env.roleName}&destination=${encodeURIComponent(destination)}`;
+            }
+            
+            console.log('Opening URL:', url);
+            
+            try {
+                browser.tabs.create({ url: url });
+                updateStatus('控制台已打开');
+            } catch (error) {
+                console.error('Open console error:', error);
+                alert('❌ 打开控制台失败：' + error.message);
+                updateStatus('打开失败');
+            }
+        }
+        
+        // 初始化
+        function initialize() {
+            console.log('Initializing extension');
+            updateStatus('初始化完成');
+            loadEnvironmentList();
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+        
+        console.log('Working extension script loaded');
+    </script>
+</body>
+</html>
