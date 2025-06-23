@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>独立测试</title>
+</head>
+<body style="width: 300px; height: 300px; padding: 20px; background: #e3f2fd; font-family: Arial, sans-serif;">
+    <h3>🧪 独立测试页面</h3>
+    
+    <p><strong>这是一个完全独立的测试页面</strong></p>
+    
+    <button onclick="alert('独立按钮1工作正常！');" style="width: 100%; padding: 10px; margin: 5px 0; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        独立按钮1
+    </button>
+    
+    <button onclick="console.log('独立按钮2被点击'); alert('独立按钮2工作正常！');" style="width: 100%; padding: 10px; margin: 5px 0; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        独立按钮2
+    </button>
+    
+    <button onclick="
+        const now = new Date().toLocaleString();
+        document.getElementById('info').innerHTML = '按钮3点击时间: ' + now;
+        alert('独立按钮3工作正常！时间: ' + now);
+    " style="width: 100%; padding: 10px; margin: 5px 0; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        独立按钮3
+    </button>
+    
+    <div id="info" style="background: #fff; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #ddd;">
+        点击信息将显示在这里
+    </div>
+    
+    <p style="font-size: 12px; color: #666;">
+        <strong>测试说明：</strong><br>
+        1. 双击这个HTML文件直接在Firefox中打开<br>
+        2. 测试所有按钮是否正常工作<br>
+        3. 如果这些按钮工作，说明Firefox JavaScript正常<br>
+        4. 如果这些按钮不工作，说明Firefox设置有问题
+    </p>
+    
+    <script>
+        console.log('独立测试页面脚本执行');
+        document.getElementById('info').innerHTML = '页面加载时间: ' + new Date().toLocaleString();
+    </script>
+</body>
+</html>
