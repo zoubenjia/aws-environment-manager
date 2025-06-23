@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Environment Browser</title>
+    <style>
+        body {
+            width: 350px;
+            min-height: 400px;
+            margin: 0;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -moz-system-ui, system-ui, sans-serif;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        
+        .section {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .env-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 6px 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .env-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(2px);
+        }
+        
+        .env-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .env-icon {
+            font-size: 18px;
+        }
+        
+        .env-details {
+            flex: 1;
+        }
+        
+        .env-name {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .env-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3 style="margin: 0;">🚀 AWS Environment Browser</h3>
+        <p style="margin: 5px 0; font-size: 12px; opacity: 0.9;">Firefox版本</p>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">基础测试</div>
+        
+        <button class="btn btn-success" onclick="testBasic()">
+            ✅ JavaScript测试
+        </button>
+        
+        <button class="btn btn-info" onclick="testAPI()">
+            🔌 Firefox API测试
+        </button>
+        
+        <button class="btn btn-primary" onclick="viewStorage()">
+            👁️ 查看存储
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">环境管理</div>
+        
+        <button class="btn btn-warning" onclick="addEnvironment()">
+            ➕ 添加环境
+        </button>
+        
+        <button class="btn btn-success" onclick="resetDefault()">
+            🔄 重置默认
+        </button>
+        
+        <button class="btn btn-danger" onclick="clearStorage()">
+            🗑️ 清理存储
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">环境列表</div>
+        <div id="environmentList">
+            <!-- 环境列表将在这里显示 -->
+        </div>
+    </div>
+    
+    <script>
+        console.log('Firefox扩展脚本开始执行...');
+        
+        // 基础测试
+        function testBasic() {
+            console.log('基础测试执行');
+            alert('✅ Firefox JavaScript正常工作！\n时间: ' + new Date().toLocaleString());
+        }
+        
+        // API测试
+        function testAPI() {
+            console.log('API测试执行');
+            let msg = 'Firefox API状态:\n\n';
+            msg += 'browser存在: ' + (typeof browser !== 'undefined') + '\n';
+            msg += 'chrome存在: ' + (typeof chrome !== 'undefined') + '\n';
+            
+            if (typeof browser !== 'undefined') {
+                msg += 'browser.storage存在: ' + (typeof browser.storage !== 'undefined') + '\n';
+                msg += 'browser.storage.local存在: ' + (typeof browser.storage?.local !== 'undefined') + '\n';
+            }
+            
+            console.log('API测试结果:', msg);
+            alert(msg);
+        }
+        
+        // 查看存储
+        async function viewStorage() {
+            console.log('查看存储执行');
+            try {
+                if (typeof browser === 'undefined' || !browser.storage?.local) {
+                    alert('❌ Firefox存储API不可用');
+                    return;
+                }
+                
+                const data = await browser.storage.local.get(null);
+                console.log('存储数据:', data);
+                
+                let msg = 'Firefox存储内容:\n\n';
+                const keys = Object.keys(data);
+                
+                if (keys.length === 0) {
+                    msg += '存储为空';
+                } else {
+                    msg += '共 ' + keys.length + ' 项:\n';
+                    keys.forEach(key => {
+                        if (Array.isArray(data[key])) {
+                            msg += key + ': 数组(' + data[key].length + '项)\n';
+                        } else {
+                            msg += key + ': ' + typeof data[key] + '\n';
+                        }
+                    });
+                }
+                
+                alert(msg);
+                
+            } catch (error) {
+                console.error('查看存储失败:', error);
+                alert('❌ 查看存储失败: ' + error.message);
+            }
+        }
+        
+        // 添加环境
+        async function addEnvironment() {
+            console.log('添加环境执行');
+            try {
+                const name = prompt('环境名称:', 'Firefox测试环境');
+                if (!name) return;
+                
+                const env = {
+                    id: 'firefox_' + Date.now(),
+                    name: name,
+                    icon: '🦊',
+                    color: '#ff6611',
+                    description: 'Firefox版本添加的环境',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    regions: ['us-east-1']
+                };
+                
+                console.log('创建环境:', env);
+                
+                const result = await browser.storage.local.get(['aws_environments']);
+                let envs = result.aws_environments || [];
+                envs.push(env);
+                
+                await browser.storage.local.set({
+                    'aws_environments': envs,
+                    'firefox_save': Date.now()
+                });
+                
+                alert('✅ Firefox环境添加成功！\n名称: ' + env.name + '\nID: ' + env.id);
+                loadEnvironments();
+                
+            } catch (error) {
+                console.error('添加环境失败:', error);
+                alert('❌ 添加环境失败: ' + error.message);
+            }
+        }
+        
+        // 重置默认
+        async function resetDefault() {
+            console.log('重置默认执行');
+            if (!confirm('确定要重置为默认环境吗？')) return;
+            
+            const defaultEnvs = [
+                {
+                    id: 'production',
+                    name: '生产环境',
+                    icon: '🔴',
+                    color: '#dc3545',
+                    description: '生产环境 - 请谨慎操作',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    regions: ['eu-west-2', 'us-east-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'development',
+                    name: '开发环境',
+                    icon: '🟢',
+                    color: '#28a745',
+                    description: '开发环境 - 安全测试',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_dev',
+                    regions: ['eu-central-1', 'us-west-2'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'staging',
+                    name: '测试环境',
+                    icon: '🔵',
+                    color: '#007bff',
+                    description: '测试环境 - 预发布验证',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_staging',
+                    regions: ['ap-southeast-1', 'ap-northeast-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                }
+            ];
+            
+            try {
+                await browser.storage.local.set({
+                    'aws_environments': defaultEnvs,
+                    'firefox_reset': Date.now()
+                });
+                
+                alert('✅ 已重置为默认环境！\n共 ' + defaultEnvs.length + ' 个环境');
+                loadEnvironments();
+                
+            } catch (error) {
+                console.error('重置失败:', error);
+                alert('❌ 重置失败: ' + error.message);
+            }
+        }
+        
+        // 清理存储
+        async function clearStorage() {
+            console.log('清理存储执行');
+            if (!confirm('确定要清理所有存储数据吗？')) return;
+            
+            try {
+                await browser.storage.local.clear();
+                alert('✅ Firefox存储已清理');
+                loadEnvironments();
+            } catch (error) {
+                console.error('清理失败:', error);
+                alert('❌ 清理失败: ' + error.message);
+            }
+        }
+        
+        // 加载环境列表
+        async function loadEnvironments() {
+            console.log('加载环境列表');
+            try {
+                const result = await browser.storage.local.get(['aws_environments']);
+                const environments = result.aws_environments || [];
+                
+                const container = document.getElementById('environmentList');
+                if (!container) return;
+                
+                if (environments.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; opacity: 0.7; font-size: 12px;">暂无环境</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                environments.forEach(env => {
+                    const envDiv = document.createElement('div');
+                    envDiv.className = 'env-item';
+                    envDiv.style.borderLeft = '3px solid ' + env.color;
+                    
+                    envDiv.innerHTML = `
+                        <div class="env-info">
+                            <div class="env-icon">${env.icon}</div>
+                            <div class="env-details">
+                                <div class="env-name">${env.name}</div>
+                                <div class="env-desc">${env.description}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    envDiv.addEventListener('click', () => {
+                        openAWSConsole(env);
+                    });
+                    
+                    container.appendChild(envDiv);
+                });
+                
+            } catch (error) {
+                console.error('加载环境失败:', error);
+            }
+        }
+        
+        // 打开AWS控制台
+        function openAWSConsole(env) {
+            console.log('打开AWS控制台:', env.name);
+            
+            if (env.id === 'production') {
+                if (!confirm(`⚠️ 警告：您即将打开生产环境！\n\n环境: ${env.name}\n\n确定要继续吗？`)) {
+                    return;
+                }
+            }
+            
+            let url = 'https://console.aws.amazon.com/';
+            
+            if (env.ssoStartUrl && env.accountId && env.roleName) {
+                const region = env.regions && env.regions.length > 0 ? env.regions[0] : 'us-east-1';
+                const destination = `https://${region}.console.aws.amazon.com/console/home?region=${region}`;
+                url = `${env.ssoStartUrl}?account_id=${env.accountId}&role_name=${env.roleName}&destination=${encodeURIComponent(destination)}`;
+            }
+            
+            console.log('打开URL:', url);
+            browser.tabs.create({ url: url });
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Firefox扩展页面加载完成');
+            loadEnvironments();
+        });
+        
+        // 立即加载环境（防止DOMContentLoaded已经触发）
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            loadEnvironments();
+        }
+        
+        console.log('Firefox扩展脚本加载完成');
+    </script>
+</body>
+</html>
