@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Firefox Basic Test</title>
+</head>
+<body style="width: 300px; height: 200px; padding: 20px; background: #f0f0f0;">
+    <h3>Firefox基础测试</h3>
+    
+    <p>如果您能看到这个页面，说明HTML加载正常。</p>
+    
+    <button onclick="alert('按钮1正常工作！');" style="width: 100%; padding: 10px; margin: 5px 0;">
+        测试按钮1
+    </button>
+    
+    <button onclick="console.log('按钮2被点击'); alert('按钮2正常工作！');" style="width: 100%; padding: 10px; margin: 5px 0;">
+        测试按钮2
+    </button>
+    
+    <div id="status" style="margin-top: 10px; padding: 10px; background: #e9ecef; border-radius: 4px;">
+        状态：页面已加载
+    </div>
+    
+    <script>
+        console.log('Firefox脚本开始执行');
+        
+        // 更新状态
+        document.getElementById('status').innerHTML = '状态：JavaScript正常执行<br>时间：' + new Date().toLocaleString();
+        
+        console.log('Firefox脚本执行完成');
+    </script>
+</body>
+</html>
