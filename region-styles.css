@@ -1,0 +1,66 @@
+/* 区域选择样式 */
+.region-checkboxes {
+    max-height: 100px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    background: #f9f9f9;
+}
+
+.region-checkbox {
+    display: block;
+    margin: 4px 0;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.region-checkbox:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.region-checkbox input[type="checkbox"] {
+    margin-right: 6px;
+    transform: scale(0.9);
+}
+
+.region-checkbox input[type="checkbox"]:checked + span {
+    font-weight: 600;
+    color: #667eea;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #333;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.form-input option {
+    padding: 5px;
+}
