@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问独立配置工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .path-display {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            margin: 15px 0;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 独立配置工具访问</h1>
+        <p>从扩展快速访问配置工具</p>
+    </div>
+
+    <div class="section">
+        <h2>🚀 快速访问</h2>
+        
+        <button class="btn btn-primary" onclick="openConfigTool()">
+            🔧 打开独立配置工具
+        </button>
+        
+        <div class="status status-info">
+            ℹ️ 独立配置工具可以正常添加和管理环境
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 手动访问</h2>
+        
+        <p>如果自动打开失败，请复制以下路径到浏览器地址栏：</p>
+        
+        <div class="path-display" id="configPath">
+            file:///Users/zoubenjia/independent-config-tool.html
+        </div>
+        
+        <button class="btn btn-secondary" onclick="copyPath()">
+            📋 复制路径
+        </button>
+    </div>
+
+    <div class="section">
+        <h2>💡 使用说明</h2>
+        
+        <ol style="text-align: left;">
+            <li><strong>添加环境：</strong> 在独立工具中点击"➕ 添加新环境"</li>
+            <li><strong>配置环境：</strong> 设置环境名称、账号ID、角色等</li>
+            <li><strong>生成配置：</strong> 点击"🔄 生成配置"按钮</li>
+            <li><strong>复制配置：</strong> 将生成的配置代码复制</li>
+            <li><strong>更新扩展：</strong> 粘贴到background脚本中</li>
+            <li><strong>重新载入：</strong> 在Firefox中重新载入扩展</li>
+        </ol>
+    </div>
+
+    <script>
+        function openConfigTool() {
+            const configPath = 'file:///Users/zoubenjia/independent-config-tool.html';
+            
+            try {
+                // 尝试直接打开
+                window.open(configPath, '_blank');
+            } catch (error) {
+                // 如果失败，显示手动方法
+                alert('请手动复制路径到浏览器地址栏:\n' + configPath);
+            }
+        }
+        
+        function copyPath() {
+            const pathText = document.getElementById('configPath').textContent;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(pathText).then(() => {
+                    alert('✅ 路径已复制到剪贴板');
+                }).catch(() => {
+                    fallbackCopy(pathText);
+                });
+            } else {
+                fallbackCopy(pathText);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('✅ 路径已复制到剪贴板');
+        }
+        
+        // 页面加载时自动尝试打开配置工具
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟1秒后自动打开，给用户时间看到页面
+            setTimeout(() => {
+                const autoOpen = confirm('是否自动打开独立配置工具？');
+                if (autoOpen) {
+                    openConfigTool();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
