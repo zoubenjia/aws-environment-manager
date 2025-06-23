@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - Emergency</title>
+    <style>
+        body {
+            width: 400px;
+            min-height: 500px;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🚨 紧急修复版本</h2>
+        <p>所有功能都集成在HTML中</p>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">基础测试</div>
+        
+        <button class="btn btn-success" onclick="alert('✅ JavaScript正常工作！\n时间: ' + new Date().toLocaleString())">
+            ✅ JavaScript测试
+        </button>
+        
+        <button class="btn btn-info" onclick="
+            let msg = 'Browser API状态:\n\n';
+            msg += 'browser存在: ' + (typeof browser !== 'undefined') + '\n';
+            if (typeof browser !== 'undefined') {
+                msg += 'storage存在: ' + (typeof browser.storage !== 'undefined') + '\n';
+                msg += 'storage.local存在: ' + (typeof browser.storage?.local !== 'undefined') + '\n';
+            }
+            alert(msg);
+        ">
+            🔌 API状态检查
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">存储操作</div>
+        
+        <button class="btn btn-primary" onclick="
+            if (typeof browser === 'undefined' || !browser.storage?.local) {
+                alert('❌ 存储API不可用');
+                return;
+            }
+            browser.storage.local.get(null).then(data => {
+                let msg = '存储内容:\n\n';
+                const keys = Object.keys(data);
+                if (keys.length === 0) {
+                    msg += '存储为空';
+                } else {
+                    msg += '共 ' + keys.length + ' 项:\n';
+                    keys.forEach(key => {
+                        if (Array.isArray(data[key])) {
+                            msg += key + ': 数组(' + data[key].length + '项)\n';
+                        } else {
+                            msg += key + ': ' + typeof data[key] + '\n';
+                        }
+                    });
+                }
+                alert(msg);
+            }).catch(err => {
+                alert('❌ 读取失败: ' + err.message);
+            });
+        ">
+            👁️ 查看存储
+        </button>
+        
+        <button class="btn btn-warning" onclick="
+            if (typeof browser === 'undefined' || !browser.storage?.local) {
+                alert('❌ 存储API不可用');
+                return;
+            }
+            const name = prompt('环境名称:', '紧急测试环境');
+            if (!name) return;
+            
+            const env = {
+                id: 'emergency_' + Date.now(),
+                name: name,
+                icon: '🚨',
+                color: '#dc3545',
+                description: '紧急版本添加的环境',
+                accountId: '487783143761',
+                roleName: 'PowerUserAccess',
+                ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                regions: ['us-east-1']
+            };
+            
+            browser.storage.local.get(['aws_environments']).then(result => {
+                let envs = result.aws_environments || [];
+                envs.push(env);
+                return browser.storage.local.set({
+                    'aws_environments': envs,
+                    'emergency_save': Date.now()
+                });
+            }).then(() => {
+                alert('✅ 环境添加成功！\n名称: ' + env.name + '\nID: ' + env.id);
+            }).catch(err => {
+                alert('❌ 保存失败: ' + err.message);
+            });
+        ">
+            ➕ 紧急添加环境
+        </button>
+        
+        <button class="btn btn-danger" onclick="
+            if (confirm('确定要清理所有存储数据吗？')) {
+                browser.storage.local.clear().then(() => {
+                    alert('✅ 存储已清理');
+                }).catch(err => {
+                    alert('❌ 清理失败: ' + err.message);
+                });
+            }
+        ">
+            🗑️ 清理存储
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">环境管理</div>
+        
+        <button class="btn btn-success" onclick="
+            const defaultEnvs = [
+                {
+                    id: 'production',
+                    name: '生产环境',
+                    icon: '🔴',
+                    color: '#dc3545',
+                    description: '生产环境 - 请谨慎操作',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    regions: ['eu-west-2', 'us-east-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'development',
+                    name: '开发环境',
+                    icon: '🟢',
+                    color: '#28a745',
+                    description: '开发环境 - 安全测试',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_dev',
+                    regions: ['eu-central-1', 'us-west-2'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                },
+                {
+                    id: 'staging',
+                    name: '测试环境',
+                    icon: '🔵',
+                    color: '#007bff',
+                    description: '测试环境 - 预发布验证',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_staging',
+                    regions: ['ap-southeast-1', 'ap-northeast-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console'
+                }
+            ];
+            
+            browser.storage.local.set({
+                'aws_environments': defaultEnvs,
+                'reset_timestamp': Date.now()
+            }).then(() => {
+                alert('✅ 已重置为默认环境！\n共 ' + defaultEnvs.length + ' 个环境');
+            }).catch(err => {
+                alert('❌ 重置失败: ' + err.message);
+            });
+        ">
+            🔄 重置默认环境
+        </button>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">说明</div>
+        <p style="font-size: 12px; line-height: 1.4; margin: 0;">
+            这是紧急修复版本，所有功能都直接集成在HTML中，不依赖外部JavaScript文件。
+            如果这个版本工作正常，说明问题出在JavaScript文件的加载或执行上。
+        </p>
+    </div>
+</body>
+</html>
