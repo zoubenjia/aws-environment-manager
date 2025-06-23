@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Environment Browser - 高级配置</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-description {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .environment-rule {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        
+        .environment-rule h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .color-picker {
+            width: 50px;
+            height: 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .rule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .rule-conditions {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .condition-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .condition-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .preview-section {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .url-preview {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            border: 1px solid #ddd;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom-color: #4ecdc4;
+            color: #4ecdc4;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AWS Environment Browser 高级配置</h1>
+        <p>自定义您的AWS环境识别和起始页配置</p>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="basic">基础配置</div>
+        <div class="tab" data-tab="environments">环境规则</div>
+        <div class="tab" data-tab="preview">预览测试</div>
+    </div>
+
+    <!-- 基础配置 -->
+    <div id="basic" class="tab-content active">
+        <div class="section">
+            <h2>🔧 基础设置</h2>
+            
+            <div class="form-group">
+                <label class="form-label">AWS SSO起始URL</label>
+                <input type="text" id="ssoStartUrl" class="form-input" 
+                       placeholder="https://d-xxxxxxxxxx.awsapps.com/start/#/console"
+                       value="https://d-9067f2e3cc.awsapps.com/start/#/console">
+                <div class="form-description">您的AWS SSO登录起始页面URL</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">默认AWS账户ID</label>
+                <input type="text" id="defaultAccountId" class="form-input" 
+                       placeholder="123456789012"
+                       value="487783143761">
+                <div class="form-description">您的主要AWS账户ID（12位数字）</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">URL模板</label>
+                <input type="text" id="urlTemplate" class="form-input" 
+                       value="{ssoUrl}?account_id={accountId}&role_name={roleName}&destination={destination}"
+                       readonly>
+                <div class="form-description">URL生成模板（自动生成，通常无需修改）</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 环境规则 -->
+    <div id="environments" class="tab-content">
+        <div class="section">
+            <h2>🌍 环境识别规则</h2>
+            <p>根据账户ID、区域、角色名称等条件定义不同的环境，并设置对应的颜色提示。</p>
+            
+            <div id="environmentRules">
+                <!-- 环境规则将通过JavaScript动态生成 -->
+            </div>
+            
+            <button type="button" class="btn btn-primary" onclick="addEnvironmentRule()">
+                ➕ 添加环境规则
+            </button>
+        </div>
+    </div>
+
+    <!-- 预览测试 -->
+    <div id="preview" class="tab-content">
+        <div class="section">
+            <h2>🔍 配置预览和测试</h2>
+            
+            <div class="form-group">
+                <label class="form-label">测试参数</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                    <select id="testEnvironment" class="form-input">
+                        <option value="production">生产环境</option>
+                        <option value="development">开发环境</option>
+                        <option value="staging">测试环境</option>
+                    </select>
+                    <select id="testRegion" class="form-input">
+                        <option value="eu-west-2">eu-west-2 (伦敦)</option>
+                        <option value="eu-central-1">eu-central-1 (法兰克福)</option>
+                        <option value="us-east-1">us-east-1 (北弗吉尼亚)</option>
+                        <option value="us-west-2">us-west-2 (俄勒冈)</option>
+                    </select>
+                    <button type="button" class="btn btn-secondary" onclick="generatePreviewUrl()">
+                        生成预览
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h4>生成的URL预览：</h4>
+                <div id="urlPreview" class="url-preview">
+                    点击"生成预览"查看URL
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <button type="button" class="btn btn-primary" onclick="testUrl()">
+                        🧪 在新标签页中测试
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="copyUrl()">
+                        📋 复制URL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn btn-success" id="saveAllSettings" onclick="saveAllSettings()">
+            💾 保存所有配置
+        </button>
+        <button class="btn btn-secondary" onclick="resetToDefaults()">
+            🔄 恢复默认设置
+        </button>
+    </div>
+
+    <script>
+        // 默认环境规则
+        let environmentRules = [
+            {
+                name: '生产环境',
+                icon: '🔴',
+                color: '#ff6b6b',
+                conditions: {
+                    accountId: '487783143761',
+                    rolePattern: 'PowerUserAccess_prod',
+                    regions: ['eu-west-2', 'us-east-1']
+                }
+            },
+            {
+                name: '开发环境',
+                icon: '🟢',
+                color: '#4ecdc4',
+                conditions: {
+                    accountId: '487783143761',
+                    rolePattern: 'PowerUserAccess_dev',
+                    regions: ['eu-central-1', 'us-west-2']
+                }
+            },
+            {
+                name: '测试环境',
+                icon: '🔵',
+                color: '#45b7d1',
+                conditions: {
+                    accountId: '487783143761',
+                    rolePattern: 'PowerUserAccess_staging',
+                    regions: ['ap-southeast-1', 'ap-northeast-1']
+                }
+            }
+        ];
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的active状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            const targetContent = document.getElementById(tabName);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // 激活选中的标签
+            const targetTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            // 如果切换到环境规则页面，确保渲染环境规则
+            if (tabName === 'environments') {
+                renderEnvironmentRules();
+            }
+        }
+
+        // 渲染环境规则
+        function renderEnvironmentRules() {
+            const container = document.getElementById('environmentRules');
+            container.innerHTML = '';
+            
+            environmentRules.forEach((rule, index) => {
+                const ruleDiv = document.createElement('div');
+                ruleDiv.className = 'environment-rule';
+                ruleDiv.innerHTML = `
+                    <h4>
+                        <span>${rule.icon} ${rule.name}</span>
+                        <button type="button" class="btn btn-danger" onclick="removeEnvironmentRule(${index})">
+                            🗑️ 删除
+                        </button>
+                    </h4>
+                    
+                    <div class="rule-grid">
+                        <div>
+                            <label class="form-label">环境名称</label>
+                            <input type="text" class="form-input" value="${rule.name}" 
+                                   onchange="updateRule(${index}, 'name', this.value)">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">图标</label>
+                            <input type="text" class="form-input" value="${rule.icon}" 
+                                   onchange="updateRule(${index}, 'icon', this.value)">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">颜色</label>
+                            <input type="color" class="color-picker" value="${rule.color}" 
+                                   onchange="updateRule(${index}, 'color', this.value)">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">角色名称模式</label>
+                            <input type="text" class="form-input" value="${rule.conditions.rolePattern}" 
+                                   onchange="updateRuleCondition(${index}, 'rolePattern', this.value)">
+                        </div>
+                    </div>
+                    
+                    <div class="rule-conditions">
+                        <label class="form-label">识别条件</label>
+                        
+                        <div class="condition-item">
+                            <label>账户ID:</label>
+                            <input type="text" class="form-input" value="${rule.conditions.accountId}" 
+                                   onchange="updateRuleCondition(${index}, 'accountId', this.value)">
+                        </div>
+                        
+                        <div class="condition-item">
+                            <label>适用区域:</label>
+                            <input type="text" class="form-input" value="${rule.conditions.regions.join(', ')}" 
+                                   placeholder="eu-west-2, us-east-1"
+                                   onchange="updateRuleCondition(${index}, 'regions', this.value.split(',').map(r => r.trim()))">
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(ruleDiv);
+            });
+        }
+
+        // 添加环境规则
+        function addEnvironmentRule() {
+            const newRule = {
+                name: '新环境',
+                icon: '⚪',
+                color: '#6c757d',
+                conditions: {
+                    accountId: document.getElementById('defaultAccountId').value,
+                    rolePattern: 'PowerUserAccess_new',
+                    regions: ['us-east-1']
+                }
+            };
+            
+            environmentRules.push(newRule);
+            renderEnvironmentRules();
+        }
+
+        // 删除环境规则
+        function removeEnvironmentRule(index) {
+            if (confirm('确定要删除这个环境规则吗？')) {
+                environmentRules.splice(index, 1);
+                renderEnvironmentRules();
+            }
+        }
+
+        // 更新规则
+        function updateRule(index, field, value) {
+            environmentRules[index][field] = value;
+        }
+
+        // 更新规则条件
+        function updateRuleCondition(index, field, value) {
+            environmentRules[index].conditions[field] = value;
+        }
+
+        // 生成预览URL
+        function generatePreviewUrl() {
+            const ssoUrl = document.getElementById('ssoStartUrl').value;
+            const accountId = document.getElementById('defaultAccountId').value;
+            const environment = document.getElementById('testEnvironment').value;
+            const region = document.getElementById('testRegion').value;
+            
+            // 找到对应的环境规则
+            const rule = environmentRules.find(r => r.name.toLowerCase().includes(environment));
+            const roleName = rule ? rule.conditions.rolePattern : 'PowerUserAccess_' + environment;
+            
+            const destinationUrl = `https://${region}.console.aws.amazon.com/console/home?region=${region}`;
+            const encodedDestination = encodeURIComponent(destinationUrl);
+            
+            const finalUrl = `${ssoUrl}?account_id=${accountId}&role_name=${roleName}&destination=${encodedDestination}`;
+            
+            document.getElementById('urlPreview').textContent = finalUrl;
+        }
+
+        // 测试URL
+        function testUrl() {
+            const url = document.getElementById('urlPreview').textContent;
+            if (url && url !== '点击"生成预览"查看URL') {
+                window.open(url, '_blank');
+            } else {
+                alert('请先生成预览URL');
+            }
+        }
+
+        // 复制URL
+        function copyUrl() {
+            const url = document.getElementById('urlPreview').textContent;
+            if (url && url !== '点击"生成预览"查看URL') {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('URL已复制到剪贴板');
+                });
+            } else {
+                alert('请先生成预览URL');
+            }
+        }
+
+        // 保存所有设置
+        async function saveAllSettings() {
+            const settings = {
+                ssoStartUrl: document.getElementById('ssoStartUrl').value,
+                defaultAccountId: document.getElementById('defaultAccountId').value,
+                environmentRules: environmentRules
+            };
+            
+            try {
+                await browser.storage.local.set(settings);
+                
+                const button = document.getElementById('saveAllSettings');
+                const originalText = button.textContent;
+                button.textContent = '✅ 已保存';
+                button.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#28a745';
+                }, 2000);
+                
+                alert('配置已保存！请重新载入扩展以应用新配置。');
+                
+            } catch (error) {
+                console.error('保存设置失败:', error);
+                alert('保存失败，请检查控制台错误信息');
+            }
+        }
+
+        // 恢复默认设置
+        function resetToDefaults() {
+            if (confirm('确定要恢复默认设置吗？这将清除所有自定义配置。')) {
+                document.getElementById('ssoStartUrl').value = 'https://d-9067f2e3cc.awsapps.com/start/#/console';
+                document.getElementById('defaultAccountId').value = '487783143761';
+                
+                // 重置环境规则
+                environmentRules = [
+                    {
+                        name: '生产环境',
+                        icon: '🔴',
+                        color: '#ff6b6b',
+                        conditions: {
+                            accountId: '487783143761',
+                            rolePattern: 'PowerUserAccess_prod',
+                            regions: ['eu-west-2', 'us-east-1']
+                        }
+                    },
+                    {
+                        name: '开发环境',
+                        icon: '🟢',
+                        color: '#4ecdc4',
+                        conditions: {
+                            accountId: '487783143761',
+                            rolePattern: 'PowerUserAccess_dev',
+                            regions: ['eu-central-1', 'us-west-2']
+                        }
+                    },
+                    {
+                        name: '测试环境',
+                        icon: '🔵',
+                        color: '#45b7d1',
+                        conditions: {
+                            accountId: '487783143761',
+                            rolePattern: 'PowerUserAccess_staging',
+                            regions: ['ap-southeast-1', 'ap-northeast-1']
+                        }
+                    }
+                ];
+                
+                renderEnvironmentRules();
+            }
+        }
+
+        // 加载设置
+        async function loadSettings() {
+            try {
+                const settings = await browser.storage.local.get([
+                    'ssoStartUrl',
+                    'defaultAccountId',
+                    'environmentRules'
+                ]);
+                
+                if (settings.ssoStartUrl) {
+                    document.getElementById('ssoStartUrl').value = settings.ssoStartUrl;
+                }
+                
+                if (settings.defaultAccountId) {
+                    document.getElementById('defaultAccountId').value = settings.defaultAccountId;
+                }
+                
+                if (settings.environmentRules) {
+                    environmentRules = settings.environmentRules;
+                }
+                
+                renderEnvironmentRules();
+                
+            } catch (error) {
+                console.error('加载设置失败:', error);
+            }
+        }
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 绑定标签页点击事件
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // 加载设置和渲染环境规则
+            loadSettings();
+            renderEnvironmentRules();
+        });
+    </script>
+</body>
+</html>
