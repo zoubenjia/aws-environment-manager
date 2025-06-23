@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Environment Manager</title>
+    <style>
+        body {
+            width: 400px;
+            min-height: 500px;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: system-ui, sans-serif;
+            color: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .btn-add { background: #28a745; color: white; }
+        .btn-view { background: #007bff; color: white; }
+        .btn-reset { background: #ffc107; color: #212529; }
+        .btn-clear { background: #dc3545; color: white; }
+        
+        .env-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .env-item {
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .env-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(4px);
+        }
+        
+        .env-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .env-desc {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🚀 AWS Environment Manager</h2>
+        <p>直接解决方案</p>
+    </div>
+    
+    <div class="status" id="status">
+        状态：准备就绪
+    </div>
+    
+    <button class="btn btn-add" id="directAddBtn">
+        ➕ 直接添加环境
+    </button>
+    
+    <button class="btn btn-view" id="directViewBtn">
+        👁️ 查看所有环境
+    </button>
+    
+    <button class="btn btn-reset" id="directResetBtn">
+        🔄 重置为默认
+    </button>
+    
+    <button class="btn btn-clear" id="directClearBtn">
+        🗑️ 清空所有数据
+    </button>
+    
+    <div class="env-list" id="envList">
+        <!-- 环境列表将在这里显示 -->
+    </div>
+    
+    <script>
+        console.log('🚀 直接解决方案脚本开始执行');
+        
+        // 状态更新函数
+        function updateStatus(msg) {
+            const statusEl = document.getElementById('status');
+            if (statusEl) {
+                statusEl.textContent = '状态：' + msg;
+                console.log('状态：' + msg);
+            }
+        }
+        
+        // 直接添加环境
+        async function directAddEnvironment() {
+            console.log('🎯 直接添加环境开始');
+            updateStatus('开始添加环境...');
+            
+            try {
+                // 获取用户输入
+                const name = prompt('请输入环境名称:', '新环境 ' + new Date().toLocaleTimeString());
+                if (!name || name.trim() === '') {
+                    updateStatus('用户取消添加');
+                    return;
+                }
+                
+                const description = prompt('请输入环境描述:', '自定义环境');
+                if (description === null) {
+                    updateStatus('用户取消添加');
+                    return;
+                }
+                
+                // 创建环境对象
+                const newEnv = {
+                    id: 'direct_' + Date.now(),
+                    name: name.trim(),
+                    icon: '🆕',
+                    color: '#28a745',
+                    description: description.trim() || '自定义环境',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    regions: ['us-east-1'],
+                    createdAt: new Date().toISOString()
+                };
+                
+                console.log('创建的环境对象:', newEnv);
+                updateStatus('保存环境数据...');
+                
+                // 获取现有环境
+                const result = await browser.storage.local.get(['aws_environments']);
+                let environments = result.aws_environments || [];
+                console.log('现有环境数量:', environments.length);
+                
+                // 添加新环境
+                environments.push(newEnv);
+                console.log('添加后环境数量:', environments.length);
+                
+                // 保存到存储
+                await browser.storage.local.set({
+                    'aws_environments': environments,
+                    'last_update': Date.now(),
+                    'direct_add_count': (result.direct_add_count || 0) + 1
+                });
+                
+                console.log('✅ 环境保存成功');
+                
+                // 验证保存
+                const verification = await browser.storage.local.get(['aws_environments']);
+                console.log('验证保存结果:', verification.aws_environments?.length);
+                
+                if (verification.aws_environments && verification.aws_environments.length === environments.length) {
+                    updateStatus('环境添加成功！');
+                    alert('✅ 环境添加成功！\n\n' + 
+                          '名称: ' + newEnv.name + '\n' +
+                          'ID: ' + newEnv.id + '\n' +
+                          '总环境数: ' + environments.length);
+                    
+                    // 刷新环境列表
+                    await loadEnvironmentList();
+                } else {
+                    throw new Error('保存验证失败');
+                }
+                
+            } catch (error) {
+                console.error('❌ 添加环境失败:', error);
+                updateStatus('添加失败: ' + error.message);
+                alert('❌ 添加环境失败:\n' + error.message);
+            }
+        }
+        
+        // 查看所有环境
+        async function directViewEnvironments() {
+            console.log('👁️ 查看所有环境');
+            updateStatus('加载环境数据...');
+            
+            try {
+                const result = await browser.storage.local.get(null);
+                console.log('所有存储数据:', result);
+                
+                let msg = '存储数据详情:\n\n';
+                
+                if (result.aws_environments) {
+                    msg += '环境数量: ' + result.aws_environments.length + '\n\n';
+                    result.aws_environments.forEach((env, index) => {
+                        msg += (index + 1) + '. ' + env.name + '\n';
+                        msg += '   ID: ' + env.id + '\n';
+                        msg += '   描述: ' + env.description + '\n';
+                        msg += '   创建: ' + (env.createdAt || '未知') + '\n\n';
+                    });
+                } else {
+                    msg += '没有找到环境数据\n\n';
+                }
+                
+                msg += '其他数据:\n';
+                Object.keys(result).forEach(key => {
+                    if (key !== 'aws_environments') {
+                        msg += key + ': ' + typeof result[key] + '\n';
+                    }
+                });
+                
+                alert(msg);
+                updateStatus('环境数据查看完成');
+                
+                // 同时更新界面列表
+                await loadEnvironmentList();
+                
+            } catch (error) {
+                console.error('❌ 查看环境失败:', error);
+                updateStatus('查看失败: ' + error.message);
+                alert('❌ 查看环境失败:\n' + error.message);
+            }
+        }
+        
+        // 重置为默认环境
+        async function directResetEnvironments() {
+            console.log('🔄 重置为默认环境');
+            
+            if (!confirm('确定要重置为默认环境吗？\n\n这将删除所有自定义环境！')) {
+                updateStatus('用户取消重置');
+                return;
+            }
+            
+            updateStatus('重置环境数据...');
+            
+            const defaultEnvs = [
+                {
+                    id: 'production',
+                    name: '生产环境',
+                    icon: '🔴',
+                    color: '#dc3545',
+                    description: '生产环境 - 请谨慎操作',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess',
+                    regions: ['eu-west-2', 'us-east-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'development',
+                    name: '开发环境',
+                    icon: '🟢',
+                    color: '#28a745',
+                    description: '开发环境 - 安全测试',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_dev',
+                    regions: ['eu-central-1', 'us-west-2'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'staging',
+                    name: '测试环境',
+                    icon: '🔵',
+                    color: '#007bff',
+                    description: '测试环境 - 预发布验证',
+                    accountId: '487783143761',
+                    roleName: 'PowerUserAccess_staging',
+                    regions: ['ap-southeast-1', 'ap-northeast-1'],
+                    ssoStartUrl: 'https://d-9067f2e3cc.awsapps.com/start/#/console',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            
+            try {
+                await browser.storage.local.set({
+                    'aws_environments': defaultEnvs,
+                    'reset_timestamp': Date.now()
+                });
+                
+                console.log('✅ 重置成功');
+                updateStatus('重置完成');
+                alert('✅ 已重置为默认环境！\n\n共 ' + defaultEnvs.length + ' 个环境');
+                
+                await loadEnvironmentList();
+                
+            } catch (error) {
+                console.error('❌ 重置失败:', error);
+                updateStatus('重置失败: ' + error.message);
+                alert('❌ 重置失败:\n' + error.message);
+            }
+        }
+        
+        // 清空所有数据
+        async function directClearAll() {
+            console.log('🗑️ 清空所有数据');
+            
+            if (!confirm('确定要清空所有数据吗？\n\n这将删除所有环境和设置！')) {
+                updateStatus('用户取消清空');
+                return;
+            }
+            
+            updateStatus('清空数据中...');
+            
+            try {
+                await browser.storage.local.clear();
+                console.log('✅ 清空成功');
+                updateStatus('数据清空完成');
+                alert('✅ 所有数据已清空！');
+                
+                // 清空界面列表
+                const envList = document.getElementById('envList');
+                if (envList) {
+                    envList.innerHTML = '<div style="text-align: center; opacity: 0.7;">数据已清空</div>';
+                }
+                
+            } catch (error) {
+                console.error('❌ 清空失败:', error);
+                updateStatus('清空失败: ' + error.message);
+                alert('❌ 清空失败:\n' + error.message);
+            }
+        }
+        
+        // 加载环境列表到界面
+        async function loadEnvironmentList() {
+            console.log('📋 加载环境列表到界面');
+            
+            try {
+                const result = await browser.storage.local.get(['aws_environments']);
+                const environments = result.aws_environments || [];
+                
+                const envList = document.getElementById('envList');
+                if (!envList) return;
+                
+                if (environments.length === 0) {
+                    envList.innerHTML = '<div style="text-align: center; opacity: 0.7;">暂无环境数据</div>';
+                    return;
+                }
+                
+                envList.innerHTML = '';
+                environments.forEach((env, index) => {
+                    const envDiv = document.createElement('div');
+                    envDiv.className = 'env-item';
+                    envDiv.style.borderLeftColor = env.color || '#28a745';
+                    
+                    envDiv.innerHTML = `
+                        <div class="env-name">${env.icon || '🔹'} ${env.name}</div>
+                        <div class="env-desc">${env.description}</div>
+                        <div style="font-size: 10px; opacity: 0.6; margin-top: 4px;">
+                            ID: ${env.id} | 创建: ${env.createdAt ? new Date(env.createdAt).toLocaleString() : '未知'}
+                        </div>
+                    `;
+                    
+                    // 点击环境项打开AWS控制台
+                    envDiv.addEventListener('click', () => {
+                        openAWSConsole(env);
+                    });
+                    
+                    envList.appendChild(envDiv);
+                });
+                
+                console.log('环境列表加载完成，共', environments.length, '个环境');
+                
+            } catch (error) {
+                console.error('加载环境列表失败:', error);
+            }
+        }
+        
+        // 打开AWS控制台
+        function openAWSConsole(env) {
+            console.log('🚀 打开AWS控制台:', env.name);
+            updateStatus('打开控制台: ' + env.name);
+            
+            if (env.id === 'production') {
+                if (!confirm(`⚠️ 警告：您即将打开生产环境！\n\n环境: ${env.name}\n\n确定要继续吗？`)) {
+                    updateStatus('用户取消打开生产环境');
+                    return;
+                }
+            }
+            
+            let url = 'https://console.aws.amazon.com/';
+            
+            if (env.ssoStartUrl && env.accountId && env.roleName) {
+                const region = env.regions && env.regions.length > 0 ? env.regions[0] : 'us-east-1';
+                const destination = `https://${region}.console.aws.amazon.com/console/home?region=${region}`;
+                url = `${env.ssoStartUrl}?account_id=${env.accountId}&role_name=${env.roleName}&destination=${encodeURIComponent(destination)}`;
+            }
+            
+            console.log('打开URL:', url);
+            
+            try {
+                browser.tabs.create({ url: url });
+                updateStatus('控制台已打开');
+            } catch (error) {
+                console.error('打开控制台失败:', error);
+                alert('❌ 打开控制台失败: ' + error.message);
+                updateStatus('打开控制台失败');
+            }
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            console.log('🔗 绑定事件');
+            
+            const directAddBtn = document.getElementById('directAddBtn');
+            if (directAddBtn) {
+                directAddBtn.addEventListener('click', directAddEnvironment);
+                console.log('✅ 直接添加按钮事件已绑定');
+            }
+            
+            const directViewBtn = document.getElementById('directViewBtn');
+            if (directViewBtn) {
+                directViewBtn.addEventListener('click', directViewEnvironments);
+                console.log('✅ 查看环境按钮事件已绑定');
+            }
+            
+            const directResetBtn = document.getElementById('directResetBtn');
+            if (directResetBtn) {
+                directResetBtn.addEventListener('click', directResetEnvironments);
+                console.log('✅ 重置按钮事件已绑定');
+            }
+            
+            const directClearBtn = document.getElementById('directClearBtn');
+            if (directClearBtn) {
+                directClearBtn.addEventListener('click', directClearAll);
+                console.log('✅ 清空按钮事件已绑定');
+            }
+            
+            updateStatus('所有事件绑定完成');
+        }
+        
+        // 初始化
+        function initialize() {
+            console.log('🚀 直接解决方案初始化');
+            updateStatus('初始化中...');
+            
+            try {
+                bindEvents();
+                loadEnvironmentList();
+                updateStatus('初始化完成 - 准备就绪');
+                console.log('✅ 直接解决方案初始化完成');
+            } catch (error) {
+                console.error('初始化失败:', error);
+                updateStatus('初始化失败: ' + error.message);
+            }
+        }
+        
+        // 启动
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+        
+        console.log('🚀 直接解决方案脚本加载完成');
+    </script>
+</body>
+</html>
