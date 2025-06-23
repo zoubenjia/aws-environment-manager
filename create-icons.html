@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS Environment Browser - Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .icon-preview { margin: 20px 0; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>AWS Environment Browser - 图标生成器</h1>
+    
+    <div class="icon-preview">
+        <h3>16x16 图标</h3>
+        <canvas id="icon16" width="16" height="16"></canvas>
+        
+        <h3>32x32 图标</h3>
+        <canvas id="icon32" width="32" height="32"></canvas>
+        
+        <h3>48x48 图标</h3>
+        <canvas id="icon48" width="48" height="48"></canvas>
+        
+        <h3>128x128 图标</h3>
+        <canvas id="icon128" width="128" height="128"></canvas>
+    </div>
+    
+    <button onclick="downloadIcons()">下载图标</button>
+    
+    <script>
+        function createIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // 绘制背景
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // 绘制AWS云图标
+            ctx.fillStyle = 'white';
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (size >= 32) {
+                // 大图标显示云和箭头
+                ctx.fillText('☁️', size/2, size/2 - size*0.1);
+                ctx.font = `${size * 0.3}px Arial`;
+                ctx.fillText('⚡', size/2, size/2 + size*0.2);
+            } else {
+                // 小图标只显示云
+                ctx.fillText('☁️', size/2, size/2);
+            }
+            
+            // 添加边框
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(0, 0, size, size);
+        }
+        
+        // 创建所有尺寸的图标
+        createIcon(document.getElementById('icon16'), 16);
+        createIcon(document.getElementById('icon32'), 32);
+        createIcon(document.getElementById('icon48'), 48);
+        createIcon(document.getElementById('icon128'), 128);
+        
+        function downloadIcons() {
+            ['16', '32', '48', '128'].forEach(size => {
+                const canvas = document.getElementById(`icon${size}`);
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
